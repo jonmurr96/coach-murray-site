@@ -8,7 +8,7 @@ import {
   json,
   readJson,
   requireMethod,
-} from "./_shared.mts";
+} from "../lib/shared.mts";
 
 export default async function handler(request: Request, _context: Context) {
   try {

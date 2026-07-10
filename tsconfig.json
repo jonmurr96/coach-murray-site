@@ -2,7 +2,7 @@
   "include": [
     "client/src/**/*",
     "shared/**/*",
-    "netlify/functions/**/*",
+    "netlify/**/*",
     "tests/**/*",
     "vite.config.ts",
     "vitest.config.ts"

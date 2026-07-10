@@ -10,7 +10,7 @@ import {
   packageNameFromSession,
   requireMethod,
   requiredEnv,
-} from "./_shared.mts";
+} from "../lib/shared.mts";
 
 async function recordCheckout(session: Stripe.Checkout.Session) {
   const email = session.customer_details?.email ?? session.customer_email;
