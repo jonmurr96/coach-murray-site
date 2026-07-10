@@ -47,20 +47,30 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 @keyframes orbFloat{0%{transform:translate(var(--ox),var(--oy)) scale(1)}100%{transform:translate(var(--ox),var(--oy)) scale(1.08)}}
 #nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .4s ease;padding:20px 32px}
 #nav.scrolled{background:rgba(5,5,7,0.95);border-bottom:1px solid var(--gb);backdrop-filter:blur(20px) saturate(180%)}
-.nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .nav-logo{display:flex;align-items:center;gap:14px;cursor:pointer;background:none;border:0;color:inherit;text-align:left;min-height:44px}
 .nav-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--gold) 0%,var(--goldL) 50%,var(--gold) 100%);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--bg);letter-spacing:-.5px}
 .nav-brand{font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:1px;line-height:1.2;text-transform:uppercase}
 .nav-sub{font-family:var(--font);font-size:9px;color:var(--tm);letter-spacing:2.5px;text-transform:uppercase;font-weight:500;margin-top:2px}
-.nav-links{display:flex;align-items:center;gap:32px}
-.nav-link{font-family:var(--font);font-size:11px;color:var(--tm);cursor:pointer;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:color .3s;background:none;border:none;padding:6px 2px;position:relative}
+.nav-links{display:flex;align-items:center;gap:24px;min-width:0}
+.nav-link{font-family:var(--font);font-size:11px;color:var(--tm);cursor:pointer;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:color .3s;background:none;border:none;padding:6px 2px;position:relative}
 .nav-link::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
 .nav-link:hover{color:var(--txt)}
 .nav-link:hover::after{transform:scaleX(1)}
-.nav-cta{padding:11px 24px;border-radius:8px;cursor:pointer;background:var(--gold);font-family:var(--font);font-size:11px;font-weight:700;color:var(--bg);letter-spacing:1.5px;text-transform:uppercase;transition:all .3s var(--ease);border:none}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:4px}
+.nav-auth-link{min-height:44px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--gb);background:rgba(255,255,255,.025);color:var(--ts);font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;transition:color .3s,border-color .3s,background .3s}
+.nav-auth-link:hover{color:var(--gold);border-color:var(--goldB);background:var(--goldDim)}
+.nav-auth-link.coach{color:var(--tm);background:transparent}
+.nav-cta{min-height:44px;padding:11px 24px;border-radius:8px;cursor:pointer;background:var(--gold);font-family:var(--font);font-size:11px;font-weight:700;color:var(--bg);letter-spacing:1.5px;text-transform:uppercase;transition:all .3s var(--ease);border:none}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(212,170,64,0.3);background:var(--goldL)}
-.nav-mobile-cta{display:none;min-height:44px;padding:9px 16px;border-radius:8px;border:1px solid var(--gold);background:var(--gold);color:var(--bg);font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
-@media(max-width:768px){.nav-links{display:none}.nav-mobile-cta{display:inline-flex;align-items:center}#nav{padding:14px 16px}}
+.nav-mobile-actions{display:none;align-items:center;gap:6px;flex:0 0 auto}
+.nav-mobile-signin,.nav-mobile-cta{min-height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.nav-mobile-signin{padding:9px 12px;border:1px solid var(--goldB);background:rgba(5,5,7,.82);color:var(--gold)}
+.nav-mobile-cta{padding:9px 14px;border:1px solid var(--gold);background:var(--gold);color:var(--bg)}
+.mobile-signin-short{display:none}
+@media(max-width:1040px){.nav-links{display:none}.nav-mobile-actions{display:flex}#nav{padding:14px 16px}}
+@media(max-width:390px){.mobile-signin-full{display:none}.mobile-signin-short{display:inline}.nav-inner{gap:8px}.nav-logo{gap:10px}.nav-mobile-signin{padding-left:10px;padding-right:10px}.nav-mobile-cta{padding-left:12px;padding-right:12px}}
+@media(max-width:340px){.nav-mark{width:34px;height:34px}.nav-brand{font-size:11px}.nav-sub{display:none}}
 .hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:center;padding:140px 32px 60px}
 .orb{position:absolute;border-radius:50%;filter:blur(var(--blur));pointer-events:none;animation:orbFloat 12s ease-in-out infinite alternate}
 .hero-line-v{position:absolute;top:20%;right:8%;width:1px;height:120px;background:linear-gradient(to bottom,var(--goldB),transparent);opacity:.5}
@@ -87,9 +97,9 @@ h1{font-family:var(--font);font-size:clamp(56px,8.5vw,108px);font-weight:800;lin
 .hero-stat:not(:last-child)::after{content:'';position:absolute;right:0;top:8px;bottom:8px;width:1px;background:var(--gb)}
 .stat-num{font-family:var(--font);font-size:38px;font-weight:800;color:var(--gold);letter-spacing:-2px;line-height:1}
 .stat-lbl{font-family:var(--font);font-size:10px;color:var(--tm);margin-top:6px;letter-spacing:2px;text-transform:uppercase;font-weight:500}
-.scroll-indicator{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.3}
+.scroll-indicator{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.78}
 .scroll-line{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--tm))}
-.scroll-text{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
+.scroll-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt)}
 .ticker-wrap{overflow:hidden;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);padding:18px 0;background:var(--surface)}
 .ticker-inner{display:flex;animation:ticker 35s linear infinite;white-space:nowrap;width:max-content}
 .ticker-item{font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;padding:0 28px}
@@ -178,7 +188,7 @@ h1{font-family:var(--font);font-size:clamp(56px,8.5vw,108px);font-weight:800;lin
 .form-input:focus{border-color:var(--gold);background:rgba(255,255,255,.05);box-shadow:0 0 0 3px rgba(212,170,64,.12)}
 .form-input::placeholder{color:var(--tm);font-style:italic}
 .chip-group{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:10px 18px;border-radius:8px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;letter-spacing:.5px;background:rgba(255,255,255,.02);color:var(--tm);border:1px solid var(--gb);transition:all .2s var(--ease);min-height:40px;display:inline-flex;align-items:center}
+.chip{padding:10px 18px;border-radius:8px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;letter-spacing:.5px;background:rgba(255,255,255,.02);color:var(--tm);border:1px solid var(--gb);transition:all .2s var(--ease);min-height:44px;display:inline-flex;align-items:center}
 .chip:hover{background:rgba(255,255,255,.05);color:var(--ts);border-color:rgba(255,255,255,.12)}
 .chip.active{background:var(--goldDim);color:var(--gold);border-color:var(--goldB)}
 .form-submit{padding:17px 28px;border-radius:10px;cursor:pointer;text-align:center;width:100%;font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 24px rgba(212,170,64,.2);transition:all .3s var(--ease);border:none}
@@ -189,6 +199,8 @@ h1{font-family:var(--font);font-size:clamp(56px,8.5vw,108px);font-weight:800;lin
 .success-icon-wrap{width:60px;height:60px;border-radius:30px;margin:0 auto 20px;background:var(--greenDim);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(61,220,132,.15);font-size:24px}
 .success-h3{font-family:var(--font);font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-.5px}
 .success-body{font-family:var(--fontBody);font-size:15px;color:var(--ts);margin:0;line-height:1.65}
+.client-login-link{display:inline-flex;min-height:44px;align-items:center;margin-top:12px;color:var(--gold);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.3px;text-decoration:none}
+.client-login-link:hover{text-decoration:underline;text-underline-offset:4px}
 .cal-wrap{background:var(--glass);border:1px solid var(--gb);border-radius:24px;overflow:hidden;backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .cal-head{padding:24px 28px;border-bottom:1px solid var(--gb)}
 .cal-head-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
@@ -208,8 +220,8 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
 .footer-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldL));display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:12px;font-weight:800;color:var(--bg)}
 .footer-name{font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.2px}
 .footer-copy{font-family:var(--font);font-size:10px;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
-.footer-social{display:flex;gap:18px}
-.social-btn{display:flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;color:var(--tm);cursor:pointer;transition:color .3s;background:none;border:none;padding:6px 0}
+.footer-social{display:flex;align-items:center;justify-content:flex-end;gap:4px 18px;flex-wrap:wrap}
+.social-btn{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:600;color:var(--tm);cursor:pointer;transition:color .3s;background:none;border:none;padding:6px 0}
 .social-btn:hover{color:var(--gold)}
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(0.16,1,0.3,1),transform .8s cubic-bezier(0.16,1,0.3,1)}
 .reveal.visible{opacity:1;transform:none}
@@ -587,6 +599,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
   .nav-cta{padding:9px 18px}
   footer{padding:40px 20px}
   .footer-inner{flex-direction:column;align-items:flex-start;gap:24px}
+  .footer-social{width:100%;justify-content:flex-start}
   .pkg-grid{gap:14px}
   .apply-form-wrap{padding:28px 22px}
   .orb,.hero-line-svg{display:none}
@@ -637,9 +650,16 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
       <button class="nav-link" onclick="cmScroll('about')">About</button>
       <button class="nav-link" onclick="cmScroll('packages')">Packages</button>
       <button class="nav-link" onclick="cmScroll('faq')">FAQ</button>
-      <button class="nav-cta" onclick="cmScroll('apply')" data-magnetic data-magnetic-radius="50" data-magnetic-travel="5">Apply Now</button>
+      <div class="nav-actions" role="group" aria-label="Account and application links">
+        <a class="nav-auth-link" href="/sign-in">Client Sign In</a>
+        <a class="nav-auth-link coach" href="/coach/sign-in">Coach OS</a>
+        <button class="nav-cta" onclick="cmScroll('apply')" data-magnetic data-magnetic-radius="50" data-magnetic-travel="5">Apply Now</button>
+      </div>
     </div>
-    <button class="nav-mobile-cta" onclick="cmScroll('apply')">Apply</button>
+    <div class="nav-mobile-actions" role="group" aria-label="Account and application links">
+      <a class="nav-mobile-signin" href="/sign-in" aria-label="Client Sign In"><span class="mobile-signin-full">Client Sign In</span><span class="mobile-signin-short" aria-hidden="true">Sign In</span></a>
+      <button class="nav-mobile-cta" onclick="cmScroll('apply')">Apply</button>
+    </div>
   </div>
 </nav>
 <main>
@@ -660,6 +680,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
         <button class="btn-primary" onclick="window.location.href='/quiz.html'" data-magnetic data-magnetic-radius="80" data-magnetic-travel="10">Find Your Plan — Free Quiz <span style="font-size:16px">→</span></button>
         <button class="btn-secondary" onclick="cmScroll('packages')" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6">View Packages</button>
       </div>
+      <a class="client-login-link" href="/sign-in">Already a client? Sign in to your dashboard →</a>
       <div class="hero-stats">
         <div class="hero-stat"><div class="stat-num">Custom</div><div class="stat-lbl">Every program</div><span class="stat-tick"></span></div>
         <div class="hero-stat"><div class="stat-num">Weekly</div><div class="stat-lbl">Check-ins</div><span class="stat-tick"></span></div>
@@ -836,7 +857,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Bi-weekly check-ins with feedback</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Exercise video demo library</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Progressive overload tracking</div>
-              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Form check video feedback</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Coach technique notes inside your program</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Program adjustments monthly</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Deload &amp; recovery programming</div>
             </div>
@@ -851,7 +872,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
             <div class="pkg-features">
               <div class="pkg-feat gold-feat"><span class="check-icon" style="color:var(--gold)"></span>Everything in Nutrition + Training</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Weekly check-ins (not bi-weekly)</div>
-              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Progress photo analysis</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Progress trend analysis from weekly check-ins</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Priority message response</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Bi-weekly program adjustments</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Detailed biofeedback tracking</div>
@@ -870,13 +891,13 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
               <div class="pkg-feat gold-feat"><span class="check-icon" style="color:var(--gold)"></span>Everything in Full Coaching, plus:</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Daily coach access &amp; communication</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Peak week programming &amp; protocol</div>
-              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Posing guidance &amp; video feedback</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Posing guidance &amp; scheduled reviews</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Stage-day game plan &amp; timeline</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Water &amp; sodium manipulation</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Post-show reverse diet strategy</div>
               <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Competition-specific cardio protocols</div>
             </div>
-            <button class="pkg-cta outline-cta" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6" data-stripe-url="https://buy.stripe.com/9B6eVdg1Fe9Xg45fcW0000m" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Apply for Prep</button>
+            <button class="pkg-cta outline-cta" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6" data-stripe-url="https://buy.stripe.com/9B6eVdg1Fe9Xg45fcW0000m" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Start Contest Prep</button>
           </div>
         </div>
       </div>
@@ -916,27 +937,27 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
               <fieldset class="form-field">
                 <legend class="form-label" style="position:static;transform:none;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:block">Primary Goal *</legend>
                 <div class="chip-group" id="goalChips">
-                  <button type="button" class="chip" data-val="Fat Loss">Fat Loss</button>
-                  <button type="button" class="chip" data-val="Muscle Gain">Muscle Gain</button>
-                  <button type="button" class="chip" data-val="Contest Prep">Contest Prep</button>
-                  <button type="button" class="chip" data-val="General Fitness">General Fitness</button>
-                  <button type="button" class="chip" data-val="Body Recomp">Body Recomp</button>
+                  <button type="button" class="chip" data-val="Fat Loss" aria-pressed="false">Fat Loss</button>
+                  <button type="button" class="chip" data-val="Muscle Gain" aria-pressed="false">Muscle Gain</button>
+                  <button type="button" class="chip" data-val="Contest Prep" aria-pressed="false">Contest Prep</button>
+                  <button type="button" class="chip" data-val="General Fitness" aria-pressed="false">General Fitness</button>
+                  <button type="button" class="chip" data-val="Body Recomp" aria-pressed="false">Body Recomp</button>
                 </div>
               </fieldset>
               <fieldset class="form-field" style="margin-bottom:28px">
                 <legend class="form-label" style="position:static;transform:none;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:block">Timeline *</legend>
                 <div class="chip-group" id="timelineChips">
-                  <button type="button" class="chip" data-val="ASAP">ASAP</button>
-                  <button type="button" class="chip" data-val="This month">This month</button>
-                  <button type="button" class="chip" data-val="Next month">Next month</button>
-                  <button type="button" class="chip" data-val="Exploring">Exploring</button>
+                  <button type="button" class="chip" data-val="ASAP" aria-pressed="false">ASAP</button>
+                  <button type="button" class="chip" data-val="This month" aria-pressed="false">This month</button>
+                  <button type="button" class="chip" data-val="Next month" aria-pressed="false">Next month</button>
+                  <button type="button" class="chip" data-val="Exploring" aria-pressed="false">Exploring</button>
                 </div>
               </fieldset>
               <label class="consent-row" for="leadConsent"><input id="leadConsent" type="checkbox"/> <span>I agree that Coach Murray may use this information to respond to my application and send related coaching information. I can unsubscribe at any time. <a href="/privacy">Privacy</a>.</span></label>
               <label class="form-honeypot" aria-hidden="true">Website<input id="leadWebsite" type="text" tabindex="-1" autocomplete="off"/></label>
               <button type="submit" class="form-submit disabled" id="submitBtn" data-magnetic data-magnetic-radius="80" data-magnetic-travel="6">Submit Application <span>→</span></button>
             </form>
-            <div class="success-wrap" id="successWrap">
+            <div class="success-wrap" id="successWrap" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
               <div class="success-icon-wrap">✓</div>
               <h3 class="success-h3">Application Received!</h3>
               <p class="success-body" id="successMsg">Your application is saved. I will review it and follow up with the next step.</p>
@@ -972,6 +993,8 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
     <div class="footer-social">
       <a class="social-btn" href="https://instagram.com/Jonmurr" target="_blank" rel="noopener" aria-label="Instagram @Jonmurr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @Jonmurr</a>
       <a class="social-btn" href="mailto:jonmurr.fit@gmail.com" aria-label="Email Coach Murray"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Email</a>
+      <a class="social-btn" href="/sign-in">Client Sign In</a>
+      <a class="social-btn" href="/coach/sign-in">Coach OS</a>
       <a class="social-btn" href="/privacy">Privacy</a>
     </div>
   </div>
@@ -1187,7 +1210,7 @@ buildTicker('tickerInner2',TICKER2);
 // — FAQ is now a wall (no accordion needed) but keep keyboard accessibility —
 // (legacy accordion handler removed — items render open by default in v2)
 
-function setupChips(groupId,key){document.querySelectorAll('#'+groupId+' .chip').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#'+groupId+' .chip').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');formData[key]=btn.dataset.val;updateSubmitBtn();updateFieldStates();});});}
+function setupChips(groupId,key){document.querySelectorAll('#'+groupId+' .chip').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#'+groupId+' .chip').forEach(function(b){b.classList.remove('active');b.setAttribute('aria-pressed','false');});btn.classList.add('active');btn.setAttribute('aria-pressed','true');formData[key]=btn.dataset.val;updateSubmitBtn();updateFieldStates();});});}
 setupChips('goalChips','goal');setupChips('timelineChips','timeline');
 
 // — Floating labels + inline validation —
@@ -1260,6 +1283,7 @@ document.getElementById('formFields').addEventListener('submit',function(event){
         var sw=document.getElementById('successWrap');
         sw.style.display='block';
         document.getElementById('successMsg').textContent='Thanks '+formData.name.split(' ')[0]+'. Your application is saved. I will review it and follow up with the right next step.';
+        sw.focus();
       },700);
     }else{
       r.text().then(function(t){console.error('Supabase insert failed',r.status,t);});

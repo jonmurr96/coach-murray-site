@@ -1,6 +1,8 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
   type ReactNode,
@@ -93,6 +95,7 @@ const previewData: PortalPayload = {
       day: "Today",
       durationMinutes: 52,
       status: "ready",
+      notes: "Work at a controlled tempo and leave one clean rep in reserve.",
     },
     {
       id: "w2",
@@ -100,6 +103,8 @@ const previewData: PortalPayload = {
       day: "Friday",
       durationMinutes: 48,
       status: "upcoming",
+      notes:
+        "Use the neutral-grip variation if your shoulders feel restricted.",
     },
     {
       id: "w3",
@@ -107,6 +112,7 @@ const previewData: PortalPayload = {
       day: "Saturday",
       durationMinutes: 35,
       status: "upcoming",
+      notes: "Keep the pace conversational and stay inside your assigned zone.",
     },
   ],
   nutrition: {
@@ -233,6 +239,16 @@ function PreviewNotice() {
   );
 }
 
+async function refreshSavedPortal(onRefresh: () => Promise<void>) {
+  try {
+    await onRefresh();
+  } catch {
+    toast.warning(
+      "Your update was saved, but the latest dashboard data could not be refreshed. Reload to see it."
+    );
+  }
+}
+
 function Overview({
   data,
   onNavigate,
@@ -244,8 +260,19 @@ function Overview({
   const progress = profile.totalWeeks
     ? Math.min(100, Math.round((profile.weekNumber / profile.totalWeeks) * 100))
     : 0;
-  const nextWorkout = data.workouts[0];
-  const unread = data.messages.filter(message => !message.read).length;
+  const nextWorkout =
+    data.workouts.find(
+      workout => !["complete", "skipped"].includes(workout.status)
+    ) ?? data.workouts[0];
+  const latestCoachNote = data.messages
+    .filter(message => message.sender === "coach")
+    .sort(
+      (left, right) =>
+        new Date(right.sentAt).getTime() - new Date(left.sentAt).getTime()
+    )[0];
+  const unread = data.messages.filter(
+    message => message.sender === "coach" && !message.read
+  ).length;
   return (
     <>
       <PageHeader
@@ -331,10 +358,10 @@ function Overview({
             <p className="cm-kicker">Coach note</p>
             <MessageCircle size={17} className="text-[var(--cm-gold)]" />
           </div>
-          {data.messages[0] ? (
+          {latestCoachNote ? (
             <>
               <blockquote className="mt-5 text-lg font-medium leading-8 text-[var(--cm-text-soft)]">
-                “{data.messages[0].body}”
+                “{latestCoachNote.body}”
               </blockquote>
               <button
                 onClick={() => onNavigate("messages")}
@@ -356,7 +383,44 @@ function Overview({
   );
 }
 
-function Training({ data }: { data: PortalPayload }) {
+function Training({
+  data,
+  onRefresh,
+}: {
+  data: PortalPayload;
+  onRefresh: () => Promise<void>;
+}) {
+  const [pendingWorkout, setPendingWorkout] = useState<{
+    id: string;
+    status: "complete" | "skipped";
+  } | null>(null);
+  const updateWorkout = async (
+    workoutId: string,
+    status: "complete" | "skipped"
+  ) => {
+    if (data.preview) {
+      toast.info(`Preview only — this workout was not marked ${status}.`);
+      return;
+    }
+    setPendingWorkout({ id: workoutId, status });
+    try {
+      await api.clientAction({ kind: "update-workout", workoutId, status });
+      toast.success(
+        status === "complete"
+          ? "Workout marked complete."
+          : "Workout marked skipped."
+      );
+      await refreshSavedPortal(onRefresh);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Workout status could not be updated."
+      );
+    } finally {
+      setPendingWorkout(null);
+    }
+  };
   return (
     <>
       <PageHeader
@@ -368,25 +432,60 @@ function Training({ data }: { data: PortalPayload }) {
         {data.workouts.length ? (
           <div className="divide-y divide-[var(--cm-border)]">
             {data.workouts.map((workout, index) => (
-              <article
-                key={workout.id}
-                className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgb(212_170_64_/_0.1)] font-extrabold text-[var(--cm-gold)]">
-                  {index + 1}
+              <article key={workout.id} className="p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgb(212_170_64_/_0.1)] font-extrabold text-[var(--cm-gold)]">
+                    {index + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--cm-text-muted)]">
+                      {workout.day}
+                    </p>
+                    <h2 className="mt-1 font-bold">{workout.title}</h2>
+                    <p className="mt-1 text-sm text-[var(--cm-text-muted)]">
+                      {workout.durationMinutes} minutes
+                    </p>
+                    {workout.notes.trim() && (
+                      <div className="mt-4 rounded-xl border border-[var(--cm-border)] bg-[var(--cm-surface-raised)] p-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-[var(--cm-gold)]">
+                          Coach notes
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-[var(--cm-text-soft)]">
+                          {workout.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <span className="w-fit rounded-full border border-[var(--cm-border)] px-3 py-1 text-xs font-bold capitalize text-[var(--cm-text-soft)]">
+                    {workout.status}
+                  </span>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold uppercase tracking-widest text-[var(--cm-text-muted)]">
-                    {workout.day}
-                  </p>
-                  <h2 className="mt-1 font-bold">{workout.title}</h2>
-                  <p className="mt-1 text-sm text-[var(--cm-text-muted)]">
-                    {workout.durationMinutes} minutes
-                  </p>
-                </div>
-                <span className="w-fit rounded-full border border-[var(--cm-border)] px-3 py-1 text-xs font-bold text-[var(--cm-text-soft)]">
-                  {workout.status}
-                </span>
+                {!["complete", "skipped"].includes(workout.status) && (
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--cm-border)] pt-4 sm:ml-14">
+                    <button
+                      type="button"
+                      className="cm-button-primary px-4 py-2 text-sm"
+                      disabled={pendingWorkout !== null}
+                      onClick={() => void updateWorkout(workout.id, "complete")}
+                    >
+                      {pendingWorkout?.id === workout.id &&
+                      pendingWorkout.status === "complete"
+                        ? "Completing…"
+                        : "Mark complete"}
+                    </button>
+                    <button
+                      type="button"
+                      className="min-h-11 rounded-[var(--cm-radius-md)] border border-[var(--cm-border)] px-4 text-sm font-bold text-[var(--cm-text-soft)] transition hover:border-[var(--cm-border-strong)] hover:text-[var(--cm-text)] disabled:opacity-50"
+                      disabled={pendingWorkout !== null}
+                      onClick={() => void updateWorkout(workout.id, "skipped")}
+                    >
+                      {pendingWorkout?.id === workout.id &&
+                      pendingWorkout.status === "skipped"
+                        ? "Skipping…"
+                        : "Skip workout"}
+                    </button>
+                  </div>
+                )}
               </article>
             ))}
           </div>
@@ -456,7 +555,13 @@ function Nutrition({ data }: { data: PortalPayload }) {
   );
 }
 
-function CheckIns({ data }: { data: PortalPayload }) {
+function CheckIns({
+  data,
+  onRefresh,
+}: {
+  data: PortalPayload;
+  onRefresh: () => Promise<void>;
+}) {
   const [energy, setEnergy] = useState(4);
   const [adherence, setAdherence] = useState(80);
   const [weight, setWeight] = useState("");
@@ -483,6 +588,7 @@ function CheckIns({ data }: { data: PortalPayload }) {
       setWins("");
       setChallenges("");
       setWeight("");
+      await refreshSavedPortal(onRefresh);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Check-in could not be saved."
@@ -618,7 +724,7 @@ function Progress({ data }: { data: PortalPayload }) {
             Primary goal
           </p>
           <h2 className="mt-2 text-2xl font-extrabold">
-            {data.profile.primaryGoal}
+            {data.profile.primaryGoal.trim() || "Not provided"}
           </h2>
           <p className="mt-6 text-sm text-[var(--cm-text-muted)]">
             Latest weight
@@ -661,9 +767,36 @@ function Progress({ data }: { data: PortalPayload }) {
   );
 }
 
-function Messages({ data }: { data: PortalPayload }) {
+function Messages({
+  data,
+  onRefresh,
+}: {
+  data: PortalPayload;
+  onRefresh: () => Promise<void>;
+}) {
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
+  const readRequestStarted = useRef(false);
+  const hasUnreadCoachMessages = data.messages.some(
+    message => message.sender === "coach" && !message.read
+  );
+
+  useEffect(() => {
+    if (data.preview || !hasUnreadCoachMessages || readRequestStarted.current)
+      return;
+    readRequestStarted.current = true;
+    void api
+      .clientAction({ kind: "mark-messages-read" })
+      .then(() => refreshSavedPortal(onRefresh))
+      .catch(error => {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Messages could not be marked read."
+        );
+      });
+  }, [data.preview, hasUnreadCoachMessages, onRefresh]);
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!body.trim()) return;
@@ -676,6 +809,7 @@ function Messages({ data }: { data: PortalPayload }) {
       await api.clientAction({ kind: "message", body });
       setBody("");
       toast.success("Message sent.");
+      await refreshSavedPortal(onRefresh);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Message could not be sent."
@@ -830,7 +964,10 @@ function AccountPage({
             {[
               ["Name", `${data.profile.firstName} ${data.profile.lastName}`],
               ["Email", data.profile.email],
-              ["Primary goal", data.profile.primaryGoal],
+              [
+                "Primary goal",
+                data.profile.primaryGoal.trim() || "Not provided",
+              ],
               [
                 "Program week",
                 `${data.profile.weekNumber} of ${data.profile.totalWeeks}`,
@@ -908,19 +1045,22 @@ function Portal() {
   );
   const [error, setError] = useState("");
 
+  const refreshPortal = useCallback(async () => {
+    const nextData = await api.getPortal();
+    setData(nextData);
+    setError("");
+  }, []);
+
   useEffect(() => {
     if (isLocalPreview) return;
-    void api
-      .getPortal()
-      .then(setData)
-      .catch(cause =>
-        setError(
-          cause instanceof ApiError
-            ? cause.message
-            : "Your dashboard could not be loaded."
-        )
-      );
-  }, []);
+    void refreshPortal().catch(cause =>
+      setError(
+        cause instanceof ApiError
+          ? cause.message
+          : "Your dashboard could not be loaded."
+      )
+    );
+  }, [refreshPortal]);
 
   useEffect(() => {
     if (!sidebarOpen && !moreOpen) return;
@@ -986,15 +1126,15 @@ function Portal() {
     active === "home" ? (
       <Overview data={data} onNavigate={navigate} />
     ) : active === "training" ? (
-      <Training data={data} />
+      <Training data={data} onRefresh={refreshPortal} />
     ) : active === "nutrition" ? (
       <Nutrition data={data} />
     ) : active === "checkins" ? (
-      <CheckIns data={data} />
+      <CheckIns data={data} onRefresh={refreshPortal} />
     ) : active === "progress" ? (
       <Progress data={data} />
     ) : active === "messages" ? (
-      <Messages data={data} />
+      <Messages data={data} onRefresh={refreshPortal} />
     ) : active === "library" ? (
       <LibraryPage data={data} />
     ) : (
@@ -1013,12 +1153,13 @@ function Portal() {
       >
         <Icon size={18} />
         <span>{label}</span>
-        {id === "messages" && data.messages.some(m => !m.read) && (
-          <span
-            className="ml-auto h-2 w-2 rounded-full bg-[var(--cm-gold)]"
-            aria-label="Unread messages"
-          />
-        )}
+        {id === "messages" &&
+          data.messages.some(m => m.sender === "coach" && !m.read) && (
+            <span
+              className="ml-auto h-2 w-2 rounded-full bg-[var(--cm-gold)]"
+              aria-label="Unread messages"
+            />
+          )}
       </button>
     ));
 

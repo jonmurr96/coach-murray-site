@@ -14,8 +14,19 @@ export default async function handler(request: Request, _context: Context) {
     requireMethod(request, "GET");
     const { profile } = await requireClientProfile(request);
     const supabase = getSupabaseAdmin();
+    const programResult = await supabase
+      .from("programs")
+      .select("id,title,summary,status,weeks")
+      .eq("client_id", profile.id)
+      .eq("status", "active")
+      .order("published_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (programResult.error)
+      throw new HttpError(500, "Dashboard data could not be loaded.");
+    const activeProgramId =
+      programResult.data?.id ?? "00000000-0000-0000-0000-000000000000";
     const [
-      programResult,
       workoutResult,
       nutritionResult,
       checkInResult,
@@ -25,23 +36,17 @@ export default async function handler(request: Request, _context: Context) {
       purchaseResult,
     ] = await Promise.all([
       supabase
-        .from("programs")
-        .select("id,title,summary,status,weeks")
-        .eq("client_id", profile.id)
-        .eq("status", "active")
-        .order("published_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase
         .from("workouts")
-        .select("id,title,scheduled_day,duration_minutes,status")
+        .select("id,title,scheduled_day,duration_minutes,status,details")
         .eq("client_id", profile.id)
+        .eq("program_id", activeProgramId)
         .order("sort_order")
         .limit(20),
       supabase
         .from("nutrition_plans")
         .select("calories,protein_grams,carb_grams,fat_grams,notes")
         .eq("client_id", profile.id)
+        .eq("program_id", activeProgramId)
         .eq("status", "active")
         .order("published_at", { ascending: false })
         .limit(1)
@@ -56,13 +61,13 @@ export default async function handler(request: Request, _context: Context) {
         .from("messages")
         .select("id,sender_role,body,sent_at,read_at")
         .eq("client_id", profile.id)
-        .order("sent_at", { ascending: true })
+        .order("sent_at", { ascending: false })
         .limit(100),
       supabase
         .from("progress_entries")
         .select("recorded_at,weight,adherence")
         .eq("client_id", profile.id)
-        .order("recorded_at")
+        .order("recorded_at", { ascending: false })
         .limit(52),
       supabase
         .from("client_resources")
@@ -72,14 +77,13 @@ export default async function handler(request: Request, _context: Context) {
       supabase
         .from("purchases")
         .select("subscription_status,package_name,current_period_end")
-        .eq("email", profile.email)
+        .eq("client_id", profile.id)
         .order("purchased_at", { ascending: false })
         .limit(1)
         .maybeSingle(),
     ]);
 
     const failure = [
-      programResult,
       workoutResult,
       nutritionResult,
       checkInResult,
@@ -128,6 +132,12 @@ export default async function handler(request: Request, _context: Context) {
         day: row.scheduled_day ?? "Assigned",
         durationMinutes: row.duration_minutes ?? 0,
         status: row.status,
+        notes:
+          row.details &&
+          typeof row.details === "object" &&
+          "notes" in row.details
+            ? String(row.details.notes ?? "")
+            : "",
       })),
       nutrition: nutritionResult.data
         ? {
@@ -145,14 +155,14 @@ export default async function handler(request: Request, _context: Context) {
         energy: row.energy,
         weight: row.weight ?? undefined,
       })),
-      messages: (messageResult.data ?? []).map(row => ({
+      messages: (messageResult.data ?? []).toReversed().map(row => ({
         id: row.id,
         sender: row.sender_role === "client" ? "client" : "coach",
         body: row.body,
         sentAt: row.sent_at,
-        read: Boolean(row.read_at),
+        read: row.sender_role === "client" || Boolean(row.read_at),
       })),
-      progress: (progressResult.data ?? []).map(row => ({
+      progress: (progressResult.data ?? []).toReversed().map(row => ({
         recordedAt: row.recorded_at,
         weight: row.weight ?? undefined,
         adherence: row.adherence ?? undefined,

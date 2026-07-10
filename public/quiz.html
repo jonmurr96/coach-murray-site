@@ -131,7 +131,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="dots" id="dots"></div>
   </div>
 
-  <div class="card" id="card"></div>
+  <div class="card" id="card" role="region" aria-live="polite" tabindex="-1"></div>
 
   <div class="trust-row">
     <span>No card required</span>
@@ -150,13 +150,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 // reach /onboarding (Stripe's success_url should be configured to land there).
 var PACKAGES = {
   nutrition:{ key:'nutrition', label:'Nutrition Plan', price:'$99/mo', emoji:'N', color:'#D4AA40',
-    features:['Custom calorie & macro targets','Food preference-based meal structure','Weekly check-ins & adjustments','Supplement protocol'],
+    features:['Custom calorie & macro targets','Food preference-based meal structure','Bi-weekly check-ins & adjustments','Supplement protocol'],
     stripeUrl:'https://buy.stripe.com/9B614ndTx6Hv7xz0i20000j' },
   training:{ key:'training', label:'Training Program', price:'$119/mo', emoji:'T', color:'#D4AA40',
     features:['Coach-built monthly programs','Built around your equipment','Progressive overload tracking','Exercise videos & cues'],
     stripeUrl:'https://buy.stripe.com/4gM7sL16L0j70571m60000k' },
   coaching:{ key:'coaching', label:'Full Coaching', price:'$179/mo', emoji:'C', color:'#D4AA40',
-    features:['Training + nutrition combined','Weekly check-ins with photo review','Direct coach access','Plan adjusts to your progress'],
+    features:['Training + nutrition combined','Weekly check-ins and progress review','Direct coach access','Plan adjusts to your progress'],
     stripeUrl:'https://buy.stripe.com/cNiaEX7v99TH2dffcW0000l' },
   contest:{ key:'contest', label:'Contest Prep', price:'$249/mo', emoji:'P', color:'#D4AA40',
     features:['Reverse-engineered prep timeline','Peak week protocol','Daily access during peak','Stage presentation guidance'],
@@ -348,13 +348,13 @@ function renderQuestion(){
 // ── RENDER CAPTURE SCREEN ──
 function renderCapture(){
   var html = '<div class="q-num">Final Step</div>'+
-    '<h2 class="q-title">Where should we send your match?</h2>'+
-    '<p class="q-sub">Get your personalized recommendation + a free 5-day cutting blueprint, instantly.</p>'+
+    '<h2 class="q-title">Save your recommendation</h2>'+
+    '<p class="q-sub">See your match instantly and let Coach Murray follow up about the right next step.</p>'+
     '<div class="field"><label for="fname">First Name</label>'+
     '<input class="inp" id="fname" type="text" placeholder="Marcus" value="'+esc(state.firstName)+'" autocomplete="given-name"/></div>'+
     '<div class="field"><label for="emailField">Email Address</label>'+
     '<input class="inp" id="emailField" type="email" placeholder="your@email.com" value="'+esc(state.email)+'" autocomplete="email"/></div>'+
-    '<label class="consent" for="quizConsent"><input id="quizConsent" type="checkbox" '+(state.consent?'checked':'')+'/> <span>I agree that Coach Murray may save my answers, send this recommendation, and send related coaching information. I can unsubscribe at any time. <a href="/privacy">Privacy</a>.</span></label>'+
+    '<label class="consent" for="quizConsent"><input id="quizConsent" type="checkbox" '+(state.consent?'checked':'')+'/> <span>I agree that Coach Murray may save my answers and contact me about this recommendation and related coaching information. I can unsubscribe at any time. <a href="/privacy">Privacy</a>.</span></label>'+
     '<label class="honeypot" aria-hidden="true">Website<input id="quizWebsite" type="text" tabindex="-1" autocomplete="off"/></label>'+
     '<div class="btn-row">'+
     '<button class="btn-back" data-action="back">← Back</button>'+
@@ -391,6 +391,7 @@ function renderResult(pkgKey, saved){
   g('card').innerHTML = html;
   // Hide top progress for clarity on result
   g('progWrap').style.display = 'none';
+  g('card').focus();
 }
 
 // ── BIND ──

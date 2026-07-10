@@ -72,6 +72,7 @@ interface FormData {
   // Step 6
   termsAgreed: boolean;
   signatureData: string;
+  typedSignature: string;
 }
 
 const initialData: FormData = {
@@ -122,6 +123,7 @@ const initialData: FormData = {
   activityLevel: "",
   termsAgreed: false,
   signatureData: "",
+  typedSignature: "",
 };
 
 const STEPS = [
@@ -1043,6 +1045,9 @@ function Step6({
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-xs text-[var(--cm-text-muted)]">
+          Agreement version: 2026-07-10
+        </p>
       </div>
 
       <FieldGroup>
@@ -1069,10 +1074,33 @@ function Step6({
 
       <FieldGroup>
         <Label required>Digital Signature</Label>
-        <p className="text-xs text-gray-500 mb-2">
-          Draw your signature below to confirm your agreement
+        <p className="mb-3 text-xs leading-5 text-[var(--cm-text-muted)]">
+          Draw your signature below, or type your full legal name in the
+          keyboard-accessible field. Either method confirms the agreement.
         </p>
         <SignatureCanvas onSign={onSign} />
+        <div className="my-4 flex items-center gap-3" aria-hidden="true">
+          <span className="h-px flex-1 bg-[var(--cm-border)]" />
+          <span className="text-xs font-bold uppercase tracking-widest text-[var(--cm-text-muted)]">
+            Or type
+          </span>
+          <span className="h-px flex-1 bg-[var(--cm-border)]" />
+        </div>
+        <label
+          htmlFor="typed-signature"
+          className="mb-2 block text-sm font-semibold text-[var(--cm-text)]"
+        >
+          Full legal name
+        </label>
+        <input
+          id="typed-signature"
+          className="cm-input px-4 py-3 text-sm placeholder:text-[var(--cm-text-muted)]"
+          value={d.typedSignature}
+          onChange={event => u("typedSignature", event.target.value)}
+          maxLength={160}
+          autoComplete="name"
+          placeholder="Type your full legal name"
+        />
       </FieldGroup>
     </div>
   );
@@ -1277,7 +1305,7 @@ function CheckoutGate({
                 "Onboarding opens from the secure link shown after a completed purchase."}
             </p>
             <a
-              href="/#coaching"
+              href="/#packages"
               className="cm-button-primary mt-6 inline-flex min-h-11 items-center justify-center gap-2 px-5 py-3"
             >
               <ArrowLeft size={16} /> View coaching packages
@@ -1336,6 +1364,13 @@ export default function OnboardingForm() {
           email: result.email || current.email,
         }));
         setCheckoutStatus("verified");
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("session_id");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`
+        );
       })
       .catch(error => {
         setCheckoutError(
@@ -1364,7 +1399,7 @@ export default function OnboardingForm() {
     }
     if (step === 5) {
       if (!data.termsAgreed) errs.push("Please agree to the client agreement");
-      if (!data.signatureData)
+      if (!data.signatureData && !data.typedSignature.trim())
         errs.push("Please provide your digital signature");
     }
     setErrors(errs);
@@ -1440,9 +1475,30 @@ export default function OnboardingForm() {
           activityLevel: data.activityLevel,
           termsAgreed: data.termsAgreed,
           signatureData: data.signatureData,
+          typedSignature: data.typedSignature.trim(),
+          termsVersion: "2026-07-10",
         });
-        setWarnings(result.warnings);
-        setSubmitted(true);
+        try {
+          sessionStorage.setItem("cm-account-email", result.email);
+          sessionStorage.setItem(
+            "cm-account-warnings",
+            JSON.stringify(result.warnings)
+          );
+        } catch {
+          // Storage is a convenience for prefilling the next screen. The
+          // verified server-side intake and account lifecycle do not depend on it.
+        }
+        if (result.accountState === "existing") {
+          window.location.assign("/sign-in?onboarding=complete");
+        } else {
+          const status =
+            result.accountState === "setup-pending"
+              ? "pending"
+              : result.accountState;
+          window.location.assign(
+            `/account/setup?status=${encodeURIComponent(status)}`
+          );
+        }
       } catch (error) {
         toast.error(
           error instanceof Error

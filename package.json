@@ -8,7 +8,9 @@
     "build": "vite build",
     "check": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "corepack pnpm build && playwright test",
     "test:watch": "vitest",
+    "provision:coach": "node scripts/provision-coach.mjs",
     "verify": "corepack pnpm check && corepack pnpm test && corepack pnpm build",
     "format": "prettier --write client netlify shared tests *.json *.ts *.md"
   },
@@ -24,7 +26,10 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@electric-sql/pglite": "^0.5.4",
     "@netlify/functions": "^4.2.1",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.1.12",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",

@@ -29,25 +29,87 @@ export async function getAccessToken() {
   return data.session?.access_token ?? null;
 }
 
-export async function sendMagicLink(
+export async function signInWithPassword(email: string, password: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Authentication is not configured yet.");
+  const { data, error } = await client.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function sendPasswordReset(
   email: string,
-  redirectPath: "/dashboard" | "/admin"
+  destination: "/dashboard" | "/admin"
 ) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Authentication is not configured yet.");
-
-  const { error } = await client.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${window.location.origin}${redirectPath}`,
-      shouldCreateUser: false,
-    },
-  });
+  const redirect = new URL("/account/reset", window.location.origin);
+  redirect.searchParams.set("next", destination);
+  const { error } = await client.auth.resetPasswordForEmail(
+    email.trim().toLowerCase(),
+    { redirectTo: redirect.toString() }
+  );
   if (error) throw error;
 }
 
-export async function signOut() {
+export async function updatePassword(password: string) {
   const client = getSupabaseBrowserClient();
-  if (client) await client.auth.signOut();
+  if (!client) throw new Error("Authentication is not configured yet.");
+  const { data, error } = await client.auth.updateUser({ password });
+  if (error) throw error;
+  return data;
+}
+
+export async function verifyEmailToken(
+  tokenHash: string,
+  type: "invite" | "recovery"
+) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Authentication is not configured yet.");
+  const { data, error } = await client.auth.verifyOtp({
+    token_hash: tokenHash,
+    type,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function clearSession() {
+  const client = getSupabaseBrowserClient();
+  if (client) {
+    const { error } = await client.auth.signOut({ scope: "local" });
+    if (error) throw error;
+  }
+}
+
+export async function revokeOtherSessions() {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Authentication is not configured yet.");
+  const { error } = await client.auth.signOut({ scope: "others" });
+  if (error) throw error;
+}
+
+export async function getCurrentSession() {
+  const client = getSupabaseBrowserClient();
+  if (!client) return null;
+  const { data, error } = await client.auth.getSession();
+  if (error) throw error;
+  return data.session;
+}
+
+export function onAuthSessionChange(callback: (signedIn: boolean) => void) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return () => undefined;
+  const { data } = client.auth.onAuthStateChange((_event, session) => {
+    callback(Boolean(session));
+  });
+  return () => data.subscription.unsubscribe();
+}
+
+export async function signOut() {
+  await clearSession();
   window.location.assign("/");
 }

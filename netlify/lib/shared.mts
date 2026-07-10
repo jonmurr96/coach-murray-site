@@ -85,6 +85,16 @@ export async function readJson(request: Request, maxBytes = 600_000) {
   return JSON.parse(text) as unknown;
 }
 
+export async function sha256Hex(value: string) {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value)
+  );
+  return Array.from(new Uint8Array(digest), byte =>
+    byte.toString(16).padStart(2, "0")
+  ).join("");
+}
+
 let stripe: Stripe | null = null;
 export function getStripe() {
   if (!stripe)
@@ -115,40 +125,109 @@ export function bearerToken(request: Request) {
   return match[1];
 }
 
+export function authLookupHttpError(error: { status?: number }) {
+  if (error.status === 400 || error.status === 401 || error.status === 403)
+    return new HttpError(401, "Your session is invalid or expired.");
+  return new HttpError(502, "Authentication could not be verified.");
+}
+
 export async function requireUser(request: Request): Promise<User> {
   const token = bearerToken(request);
   const { data, error } = await getSupabaseAdmin().auth.getUser(token);
-  if (error || !data.user)
+  if (error) throw authLookupHttpError(error);
+  if (!data.user)
     throw new HttpError(401, "Your session is invalid or expired.");
   return data.user;
 }
 
+const COACH_ROLES = new Set(["owner", "coach", "admin"]);
+
+export function userHasCoachRole(user: Pick<User, "app_metadata">) {
+  return COACH_ROLES.has(String(user.app_metadata?.role ?? "").toLowerCase());
+}
+
 export async function requireCoach(request: Request): Promise<User> {
   const user = await requireUser(request);
-  const role = String(user.app_metadata?.role ?? "").toLowerCase();
-  if (!["owner", "coach", "admin"].includes(role))
+  if (!userHasCoachRole(user))
     throw new HttpError(403, "Coach access is required.");
   return user;
 }
 
-export async function requireClientProfile(request: Request) {
-  const user = await requireUser(request);
+export type ClientProfileRecord = {
+  id: string;
+  user_id: string | null;
+  first_name: string;
+  last_name: string;
+  email: string;
+  primary_goal: string | null;
+  current_weight: number | null;
+  goal_weight: number | null;
+  week_number: number;
+  total_weeks: number;
+  stripe_customer_id: string | null;
+  account_invited_at: string | null;
+  account_setup_completed_at: string | null;
+};
+
+export function clientProfileIsReady(
+  profile:
+    Pick<ClientProfileRecord, "account_setup_completed_at"> | null | undefined
+) {
+  return Boolean(profile?.account_setup_completed_at);
+}
+
+export async function loadClientProfile(userId: string) {
   const result = await getSupabaseAdmin()
     .from("client_profiles")
     .select(
-      "id,user_id,first_name,last_name,email,primary_goal,current_weight,goal_weight,week_number,total_weeks,stripe_customer_id"
+      "id,user_id,first_name,last_name,email,primary_goal,current_weight,goal_weight,week_number,total_weeks,stripe_customer_id,account_invited_at,account_setup_completed_at"
     )
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
   if (result.error)
     throw new HttpError(500, "Client profile could not be loaded.");
-  if (!result.data)
+  return (result.data as ClientProfileRecord | null) ?? null;
+}
+
+export async function getClientProfileContext(request: Request) {
+  const user = await requireUser(request);
+  const profile = await loadClientProfile(user.id);
+  return { user, profile };
+}
+
+export async function requireClientProfile(request: Request) {
+  const { user, profile } = await getClientProfileContext(request);
+  if (!profile)
     throw new HttpError(404, "No client profile is linked to this account.");
-  return { user, profile: result.data };
+  if (!clientProfileIsReady(profile))
+    throw new HttpError(
+      403,
+      "Finish account setup before opening the client portal."
+    );
+  return { user, profile };
 }
 
 export function siteUrl() {
-  return env("SITE_URL") ?? "https://coach-murray.netlify.app";
+  const configured = requiredEnv("SITE_URL");
+  let parsed: URL;
+  try {
+    parsed = new URL(configured);
+  } catch {
+    throw new HttpError(503, "SITE_URL must be a valid absolute URL.");
+  }
+  const local =
+    parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+  if (parsed.protocol !== "https:" && !(local && parsed.protocol === "http:"))
+    throw new HttpError(503, "SITE_URL must use HTTPS.");
+  if (
+    parsed.username ||
+    parsed.password ||
+    parsed.search ||
+    parsed.hash ||
+    (parsed.pathname !== "/" && parsed.pathname !== "")
+  )
+    throw new HttpError(503, "SITE_URL must be an origin without a path.");
+  return parsed.origin;
 }
 
 export function centsToUnits(value: number | null | undefined) {
@@ -170,20 +249,56 @@ export function packageNameFromSession(session: Stripe.Checkout.Session) {
   return "Coach Murray Coaching";
 }
 
+export function paymentLinkIdFromSession(session: Stripe.Checkout.Session) {
+  const paymentLink = session.payment_link;
+  if (typeof paymentLink === "string") return paymentLink;
+  return paymentLink?.id ?? "";
+}
+
+export function approvedCheckout(session: Stripe.Checkout.Session) {
+  const allowedPaymentLinks = requiredEnv("STRIPE_ALLOWED_PAYMENT_LINK_IDS")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
+  if (!allowedPaymentLinks.length)
+    throw new HttpError(
+      503,
+      "STRIPE_ALLOWED_PAYMENT_LINK_IDS is not configured."
+    );
+  const approvedMode =
+    session.mode === "payment" || session.mode === "subscription";
+  return (
+    approvedMode &&
+    session.status === "complete" &&
+    session.payment_status === "paid" &&
+    allowedPaymentLinks.includes(paymentLinkIdFromSession(session))
+  );
+}
+
+export function checkoutLookupHttpError(error: unknown) {
+  const stripeError = error as { code?: string; statusCode?: number };
+  if (stripeError.code === "resource_missing" || stripeError.statusCode === 404)
+    return new HttpError(404, "Checkout session was not found.");
+  if (stripeError.statusCode === 401 || stripeError.statusCode === 403)
+    return new HttpError(503, "Stripe credentials could not be verified.");
+  return new HttpError(502, "Stripe could not verify checkout right now.");
+}
+
 export async function verifiedCheckout(sessionId: string) {
+  const stripeClient = getStripe();
   let session: Stripe.Checkout.Session;
   try {
-    session = await getStripe().checkout.sessions.retrieve(sessionId, {
+    session = await stripeClient.checkout.sessions.retrieve(sessionId, {
       expand: ["line_items.data.price.product"],
     });
-  } catch {
-    throw new HttpError(404, "Checkout session was not found.");
+  } catch (error) {
+    throw checkoutLookupHttpError(error);
   }
-  const isPaid =
-    session.payment_status === "paid" ||
-    session.payment_status === "no_payment_required";
-  if (session.status !== "complete" || !isPaid)
-    throw new HttpError(403, "Checkout is not complete.");
+  if (!approvedCheckout(session))
+    throw new HttpError(
+      403,
+      "Checkout is not a completed payment for an approved coaching offer."
+    );
   const email = session.customer_details?.email ?? session.customer_email;
   if (!email)
     throw new HttpError(

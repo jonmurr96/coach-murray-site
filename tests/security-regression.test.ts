@@ -48,4 +48,35 @@ describe("security regressions", () => {
     expect(netlify).toContain('publish = "dist"');
     expect(netlify).not.toContain('publish = "."');
   });
+
+  it("keeps checkout authorization and redirect origins fail-closed", () => {
+    const shared = readFileSync(
+      path.join(root, "netlify/lib/shared.mts"),
+      "utf8"
+    );
+    expect(shared).toContain("STRIPE_ALLOWED_PAYMENT_LINK_IDS");
+    expect(shared).not.toContain('payment_status === "no_payment_required"');
+    expect(shared).not.toContain(
+      'env("SITE_URL") ?? "https://coach-murray.netlify.app"'
+    );
+  });
+
+  it("restricts unpublished and unassigned Supabase content", () => {
+    const migration = readFileSync(
+      path.join(
+        root,
+        "supabase/migrations/20260710000000_coach_os_canonical.sql"
+      ),
+      "utf8"
+    );
+    expect(migration).toContain('"clients read own active programs"');
+    expect(migration).toContain('"clients read own active workouts"');
+    expect(migration).toContain('"clients read own active nutrition"');
+    expect(migration).toContain('"clients read assigned resources"');
+    expect(migration).not.toContain('"authenticated read resources"');
+    expect(migration).not.toMatch(
+      /on conflict \(purchase_id\) do update set intake_payload/i
+    );
+    expect(migration).toContain("record_lead_submission");
+  });
 });

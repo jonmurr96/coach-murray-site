@@ -35,7 +35,9 @@ export default async function handler(request: Request, _context: Context) {
         .limit(500),
       supabase
         .from("check_ins")
-        .select("id,client_id,submitted_at,adherence,energy,reviewed_at")
+        .select(
+          "id,client_id,submitted_at,adherence,energy,weight,wins,challenges,reviewed_at"
+        )
         .order("submitted_at", { ascending: false })
         .limit(100),
       supabase
@@ -130,6 +132,9 @@ export default async function handler(request: Request, _context: Context) {
         submittedAt: row.submitted_at,
         adherence: row.adherence,
         energy: row.energy,
+        weight: row.weight ?? undefined,
+        wins: row.wins ?? "",
+        challenges: row.challenges ?? "",
         reviewed: Boolean(row.reviewed_at),
       })),
       messages: messages.map(row => ({

@@ -4,6 +4,7 @@ import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const OnboardingForm = lazy(() => import("./pages/OnboardingForm"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const ClientDashboard = lazy(() => import("./pages/dashboard/ClientDashboard"));
 
@@ -36,6 +37,21 @@ export default function App() {
         }
       >
         <Switch>
+          <Route path="/sign-in">
+            <AuthPage mode="client" />
+          </Route>
+          <Route path="/coach/sign-in">
+            <AuthPage mode="coach" />
+          </Route>
+          <Route path="/account/setup">
+            <AuthPage mode="setup" />
+          </Route>
+          <Route path="/account/confirm">
+            <AuthPage mode="confirm" />
+          </Route>
+          <Route path="/account/reset">
+            <AuthPage mode="reset" />
+          </Route>
           <Route path="/onboarding" component={OnboardingForm} />
           <Route path="/dashboard" component={ClientDashboard} />
           <Route path="/portal">

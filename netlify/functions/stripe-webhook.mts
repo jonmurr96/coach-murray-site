@@ -1,6 +1,7 @@
 import type { Context } from "@netlify/functions";
 import type Stripe from "stripe";
 import {
+  approvedCheckout,
   env,
   errorResponse,
   getStripe,
@@ -43,7 +44,7 @@ async function recordCheckout(session: Stripe.Checkout.Session) {
 }
 
 async function updateSubscription(subscription: Stripe.Subscription) {
-  const { error } = await getSupabaseAdmin()
+  const { data, error } = await getSupabaseAdmin()
     .from("purchases")
     .update({
       subscription_status: subscription.status,
@@ -54,9 +55,16 @@ async function updateSubscription(subscription: Stripe.Subscription) {
       ).toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq("stripe_subscription_id", subscription.id);
+    .eq("stripe_subscription_id", subscription.id)
+    .select("id")
+    .maybeSingle();
   if (error)
     throw new HttpError(500, "Subscription status could not be recorded.");
+  if (!data)
+    throw new HttpError(
+      503,
+      "Subscription purchase is not available for reconciliation yet."
+    );
 }
 
 export default async function handler(request: Request, _context: Context) {
@@ -65,12 +73,14 @@ export default async function handler(request: Request, _context: Context) {
     const signature = request.headers.get("stripe-signature");
     if (!signature) throw new HttpError(400, "Stripe signature is missing.");
     const payload = await request.text();
+    const stripeClient = getStripe();
+    const webhookSecret = requiredEnv("STRIPE_WEBHOOK_SECRET");
     let event: Stripe.Event;
     try {
-      event = await getStripe().webhooks.constructEventAsync(
+      event = await stripeClient.webhooks.constructEventAsync(
         payload,
         signature,
-        requiredEnv("STRIPE_WEBHOOK_SECRET")
+        webhookSecret
       );
     } catch {
       throw new HttpError(400, "Stripe signature is invalid.");
@@ -80,7 +90,15 @@ export default async function handler(request: Request, _context: Context) {
       event.type === "checkout.session.completed" ||
       event.type === "checkout.session.async_payment_succeeded"
     ) {
-      await recordCheckout(event.data.object as Stripe.Checkout.Session);
+      const eventSession = event.data.object as Stripe.Checkout.Session;
+      const session = await stripeClient.checkout.sessions.retrieve(
+        eventSession.id,
+        { expand: ["line_items.data.price.product"] }
+      );
+      if (!approvedCheckout(session)) {
+        return json(200, { received: true, ignored: true });
+      }
+      await recordCheckout(session);
     } else if (
       event.type === "customer.subscription.updated" ||
       event.type === "customer.subscription.deleted"
@@ -95,13 +113,22 @@ export default async function handler(request: Request, _context: Context) {
           ? parentSubscription
           : parentSubscription?.id;
       if (subscriptionId) {
-        await getSupabaseAdmin()
+        const { data, error } = await getSupabaseAdmin()
           .from("purchases")
           .update({
             subscription_status: "past_due",
             updated_at: new Date().toISOString(),
           })
-          .eq("stripe_subscription_id", subscriptionId);
+          .eq("stripe_subscription_id", subscriptionId)
+          .select("id")
+          .maybeSingle();
+        if (error)
+          throw new HttpError(500, "Failed payment could not be recorded.");
+        if (!data)
+          throw new HttpError(
+            503,
+            "Subscription purchase is not available for reconciliation yet."
+          );
       }
     }
 

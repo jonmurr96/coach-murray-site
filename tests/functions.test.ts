@@ -4,6 +4,7 @@ import submitOnboarding from "../netlify/functions/submit-onboarding.mts";
 import clientAction from "../netlify/functions/client-action.mts";
 import adminData from "../netlify/functions/admin-data.mts";
 import billingPortal from "../netlify/functions/billing-portal.mts";
+import stripeWebhook from "../netlify/functions/stripe-webhook.mts";
 
 const context = {} as never;
 
@@ -18,6 +19,33 @@ describe("Netlify function boundaries", () => {
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
       error: "A valid checkout session is required.",
+    });
+  });
+
+  it("reports missing Stripe configuration instead of a false 404 or signature error", async () => {
+    delete process.env.STRIPE_SECRET_KEY;
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+    const checkoutResponse = await verifyCheckout(
+      new Request(
+        "https://coach.example/.netlify/functions/verify-checkout?session_id=cs_test_1234567890abcdefghijkl"
+      ),
+      context
+    );
+    const webhookResponse = await stripeWebhook(
+      new Request("https://coach.example/.netlify/functions/stripe-webhook", {
+        method: "POST",
+        headers: { "stripe-signature": "test-signature" },
+        body: "{}",
+      }),
+      context
+    );
+    expect(checkoutResponse.status).toBe(503);
+    expect(webhookResponse.status).toBe(503);
+    await expect(checkoutResponse.json()).resolves.toEqual({
+      error: "STRIPE_SECRET_KEY is not configured.",
+    });
+    await expect(webhookResponse.json()).resolves.toEqual({
+      error: "STRIPE_SECRET_KEY is not configured.",
     });
   });
 

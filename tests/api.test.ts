@@ -36,4 +36,34 @@ describe("browser API client", () => {
       })
     );
   });
+
+  it("requests an allowlisted Coach OS intake detail by client ID", async () => {
+    const payload = {
+      profile: {
+        id: "00000000-0000-4000-8000-000000000011",
+        name: "Client A",
+        email: "client@example.com",
+        status: "active",
+      },
+      purchase: null,
+      intake: null,
+    };
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify(payload), { status: 200 })
+      );
+
+    await expect(
+      api.getAdminClientDetail("00000000-0000-4000-8000-000000000011")
+    ).resolves.toEqual(payload);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/.netlify/functions/admin-client-detail?client_id=00000000-0000-4000-8000-000000000011",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+      })
+    );
+  });
 });

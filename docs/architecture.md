@@ -9,8 +9,11 @@ flowchart LR
   B -->|"signed webhook"| D["Purchase record"]
   C -->|"server re-verifies session"| E["Client profile + intake"]
   D --> E
-  E --> F["Supabase Auth invitation"]
-  F --> G["Client dashboard"]
+  E --> F["One scanner-safe Supabase invitation"]
+  F --> I["Confirm email action"]
+  I --> J["Required password setup"]
+  J -->|"server confirms setup marker"| G["Client dashboard"]
+  G -->|"password sign in / recovery"| K["Client auth"]
   E --> H["Coach OS review queue"]
   H -->|"publish program / message"| G
   G -->|"check-in / message"| H
@@ -31,9 +34,14 @@ flowchart LR
 - Stripe Checkout session IDs are verified with the Stripe secret key before onboarding is shown and again before intake persistence.
 - Stripe webhook payloads use raw-body signature verification and idempotent purchase upserts.
 - Supabase Auth access tokens are verified server-side with `auth.getUser()`.
+- Every protected render preflights `session-context`; a browser session alone never proves client linkage or coach authorization.
+- Paid onboarding sends at most one atomically claimed invitation. A confirmed invite session remains blocked by RLS and server functions until a password update records `account_setup_completed_at`.
 - Coach access is derived from signed `app_metadata.role`, never browser-controlled `user_metadata`.
+- `SITE_URL` is required and validated as an HTTPS origin before invitations or Stripe Billing Portal sessions are created; there is no production-domain fallback.
+- Only paid sessions from the explicitly allowlisted Stripe Payment Links may unlock onboarding.
+- The first verified intake is immutable for a Checkout Session and records a terms version plus signature digest; later edits require a separate authenticated workflow.
 - Service-role, Stripe, Resend, and webhook secrets exist only in Netlify environment variables.
-- RLS is enabled on every exposed table; clients can read only records linked through their `auth.uid()`.
+- RLS is enabled on every exposed table; clients can read only records linked through their `auth.uid()` after account setup is complete.
 - Card numbers and CVC never enter Coach Murray forms. Billing changes use Stripe Billing Portal.
 
 ## Removed legacy paths

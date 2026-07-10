@@ -1,6 +1,9 @@
 node_modules/
 dist/
 .netlify/
+playwright-report/
+test-results/
+supabase/.temp/
 .env
 .env.*
 !.env.example

@@ -1,8 +1,10 @@
 import type {
   AdminAction,
+  AdminClientDetailPayload,
   AdminPayload,
   ClientAction,
   PortalPayload,
+  SessionContextPayload,
 } from "@shared/contracts";
 import { getAccessToken } from "./auth";
 
@@ -47,19 +49,30 @@ export const api = {
     );
   },
   submitOnboarding(payload: unknown) {
-    return request<{ saved: true; portalReady: boolean; warnings: string[] }>(
-      "submit-onboarding",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
+    return request<{
+      saved: true;
+      accountState: "existing" | "invited" | "setup-pending" | "invite-failed";
+      email: string;
+      warnings: string[];
+      alreadySaved: boolean;
+    }>("submit-onboarding", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  getSessionContext() {
+    return request<SessionContextPayload>("session-context");
   },
   getPortal() {
     return request<PortalPayload>("dashboard");
   },
   getAdmin() {
     return request<AdminPayload>("admin-data");
+  },
+  getAdminClientDetail(clientId: string) {
+    return request<AdminClientDetailPayload>(
+      `admin-client-detail?client_id=${encodeURIComponent(clientId)}`
+    );
   },
   clientAction(payload: ClientAction) {
     return request<{ saved: true }>("client-action", {
@@ -68,7 +81,7 @@ export const api = {
     });
   },
   adminAction(payload: AdminAction) {
-    return request<{ saved: true }>("admin-action", {
+    return request<{ saved: true; invitedAt?: string }>("admin-action", {
       method: "POST",
       body: JSON.stringify(payload),
     });
