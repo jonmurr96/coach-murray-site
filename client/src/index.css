@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --cm-bg: #050507;
+  --cm-surface: #0c0c10;
+  --cm-surface-raised: #15151a;
+  --cm-border: #292930;
+  --cm-border-strong: #3a3a43;
+  --cm-gold: #d4aa40;
+  --cm-gold-light: #f0d070;
+  --cm-gold-dark: #a77e20;
+  --cm-text: #f4f1ea;
+  --cm-text-soft: #c6c2b8;
+  --cm-text-muted: #96938b;
+  --cm-positive: #64c590;
+  --cm-warning: #f2b84b;
+  --cm-danger: #f2776b;
+  --cm-info: #73aef5;
+  --cm-radius-sm: 0.625rem;
+  --cm-radius-md: 0.875rem;
+  --cm-radius-lg: 1.25rem;
+  --cm-shadow: 0 24px 70px rgb(0 0 0 / 0.38);
+  --background: #050507;
+  --foreground: #f4f1ea;
+  --card: #0c0c10;
+  --card-foreground: #f4f1ea;
+  --popover: #15151a;
+  --popover-foreground: #f4f1ea;
+  --primary: #d4aa40;
+  --primary-foreground: #050507;
+  --secondary: #15151a;
+  --secondary-foreground: #f4f1ea;
+  --muted: #15151a;
+  --muted-foreground: #96938b;
+  --accent: #d4aa40;
+  --accent-foreground: #050507;
+  --destructive: #f2776b;
+  --border: #292930;
+  --input: #15151a;
+  --ring: #f0d070;
+  --radius: 0.875rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--cm-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(
+      circle at 85% -10%,
+      rgb(212 170 64 / 0.09),
+      transparent 33rem
+    ),
+    var(--cm-bg);
+  color: var(--cm-text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+[href] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cm-gold-light);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Cabinet Grotesk", "DM Sans", sans-serif;
+  text-wrap: balance;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: var(--cm-radius-sm);
+  background: var(--cm-gold-light);
+  color: var(--cm-bg);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.cm-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+.cm-card {
+  border: 1px solid var(--cm-border);
+  border-radius: var(--cm-radius-lg);
+  background: linear-gradient(
+    145deg,
+    rgb(21 21 26 / 0.9),
+    rgb(12 12 16 / 0.95)
+  );
+  box-shadow: var(--cm-shadow);
+}
+
+.cm-kicker {
+  color: var(--cm-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cm-button-primary {
+  min-height: 44px;
+  border: 1px solid var(--cm-gold-light);
+  border-radius: var(--cm-radius-md);
+  background: linear-gradient(135deg, var(--cm-gold-light), var(--cm-gold));
+  color: var(--cm-bg);
+  font-weight: 800;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.cm-button-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 10px 30px rgb(212 170 64 / 0.18);
+  transform: translateY(-1px);
+}
+
+.cm-button-primary:active {
+  transform: translateY(0);
+}
+
+.cm-input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--cm-border);
+  border-radius: var(--cm-radius-sm);
+  background: var(--cm-surface-raised);
+  color: var(--cm-text);
+}
+
+.cm-input:read-only {
+  color: var(--cm-text-soft);
+  background: var(--cm-surface);
+}
+
+textarea.cm-input {
+  min-height: 7rem;
+}
+
+textarea.cm-input.cm-compact {
+  min-height: 3rem;
+}
+
+.gold-text {
+  background: linear-gradient(
+    120deg,
+    var(--cm-gold-light),
+    var(--cm-gold) 55%,
+    var(--cm-gold-dark)
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cm-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cm-border-strong);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

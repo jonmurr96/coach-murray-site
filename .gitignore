@@ -1,0 +1,24 @@
+node_modules/
+dist/
+.netlify/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+node_modules/typescript/tsbuildinfo
+
+# Historical standalone artifacts retained locally for audit provenance only.
+/admin.html
+/portal.html
+/onboarding.html
+/index.html
+/quiz.html
+/profile.jpg
+/5-day-cutting-blueprint.pdf
+/_redirects
+/admin-dashboard.jsx
+/client-dashboard.jsx
+/index.html.bak
+/assets/
+/deploy.sh

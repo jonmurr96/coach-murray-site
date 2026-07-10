@@ -1,0 +1,43 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+
+const root = path.resolve(import.meta.dirname, "..");
+
+function filesUnder(relative: string): string[] {
+  const absolute = path.join(root, relative);
+  return readdirSync(absolute).flatMap(entry => {
+    const child = path.join(absolute, entry);
+    return statSync(child).isDirectory()
+      ? filesUnder(path.relative(root, child))
+      : [child];
+  });
+}
+
+describe("security regressions", () => {
+  it("keeps legacy browser credentials and raw payment fields out of deployable source", () => {
+    const files = [...filesUnder("public"), ...filesUnder("client/src")];
+    const source = files
+      .filter(file => /\.(html|ts|tsx|js|css)$/.test(file))
+      .map(file => readFileSync(file, "utf8"))
+      .join("\n");
+    expect(source).not.toMatch(
+      /coachmurray2026|service_role|sk_live_|whsec_|ANTHROPIC_API_KEY/
+    );
+    expect(source).not.toMatch(/Card Number|\bCVC\b|dangerouslySetInnerHTML/);
+    expect(source).not.toMatch(/https:\/\/[a-z]+\.supabase\.co/);
+  });
+
+  it("does not use randomness or claim an unsent quiz email", () => {
+    const quiz = readFileSync(path.join(root, "public/quiz.html"), "utf8");
+    expect(quiz).not.toContain("Math.random");
+    expect(quiz).not.toContain("on its way");
+    expect(quiz).toContain("5-day-cutting-blueprint.pdf");
+  });
+
+  it("publishes only the generated dist directory", () => {
+    const netlify = readFileSync(path.join(root, "netlify.toml"), "utf8");
+    expect(netlify).toContain('publish = "dist"');
+    expect(netlify).not.toContain('publish = "."');
+  });
+});

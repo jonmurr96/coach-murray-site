@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Find Your Plan — Coach Murray</title>
+<meta name="description" content="Take the 60-second quiz and Coach Murray will recommend the right coaching package for your goals."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin="anonymous"/>
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050507;--s1:#0C0C10;--s2:#15151A;--s3:#1D1D23;
+  --b1:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --gold:#D4AA40;--gdim:rgba(212,170,64,0.1);--gdark:#A77E20;
+  --txt:#F4F1EA;--ts:#C6C2B8;--td:#96938B;
+  --green:#64C590;--red:#F2776B;
+  --fd:'Cabinet Grotesk',sans-serif;--fb:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth;max-width:100%;overflow-x:clip}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh;max-width:100%;overflow-x:clip}
+:focus-visible{outline:3px solid #F0D070;outline-offset:3px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(232,197,71,0.06),transparent 60%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:48px 20px 80px}
+@media(max-width:480px){.wrap{padding:28px 14px 60px}}
+.hdr{text-align:center;margin-bottom:32px}
+.logo{width:52px;height:52px;border-radius:13px;margin:0 auto 14px;background:linear-gradient(135deg,var(--gold),var(--gdark));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;font-weight:800;color:#08080A}
+.eyebrow{display:inline-block;font-family:var(--fd);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.hdr h1{font-family:var(--fd);font-size:clamp(24px,6vw,34px);font-weight:800;letter-spacing:-1px;margin-bottom:8px;line-height:1.15}
+.hdr p{font-size:14px;color:var(--ts);max-width:440px;margin:0 auto}
+.prog-wrap{margin-bottom:24px}
+.prog-meta{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:8px}
+.prog-meta .pl{color:var(--td);text-transform:uppercase;letter-spacing:.5px}
+.prog-meta .pr{color:var(--gold)}
+.prog-bg{height:2px;background:var(--b1);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gdark),var(--gold));border-radius:99px;transition:width .5s var(--ease)}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--b1);transition:all .25s}
+.dot.active{background:var(--gold);transform:scale(1.4)}
+.dot.done{background:rgba(232,197,71,0.35)}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:20px;padding:32px;animation:cardIn .35s var(--ease)}
+@media(max-width:480px){.card{padding:22px 18px}}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.q-num{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.q-title{font-family:var(--fd);font-size:clamp(20px,5vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:6px;line-height:1.2}
+.q-sub{font-size:13px;color:var(--ts);margin-bottom:22px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{width:100%;min-height:64px;padding:15px 17px;border-radius:11px;cursor:pointer;background:var(--s2);border:1px solid var(--b1);color:var(--txt);font-family:var(--fb);text-align:left;display:flex;align-items:center;gap:13px;transition:all .15s var(--ease);user-select:none}
+.opt:hover{border-color:rgba(232,197,71,0.35);background:var(--s3);transform:translateX(2px)}
+.opt.selected{background:var(--gdim);border-color:var(--gold)}
+.opt-emoji{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--gold);flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(255,255,255,0.03)}
+.opt.selected .opt-emoji{background:rgba(232,197,71,0.15)}
+.opt-body{flex:1}
+.opt-title{font-weight:600;font-size:14px;margin-bottom:1px}
+.opt-desc{font-size:11px;color:var(--td)}
+.opt.selected .opt-desc{color:var(--ts)}
+.opt-arr{color:var(--td);font-size:14px;transition:all .2s}
+.opt:hover .opt-arr{color:var(--gold);transform:translateX(2px)}
+.opt.selected .opt-arr{color:var(--gold)}
+.btn-row{display:flex;gap:10px;margin-top:24px}
+.btn-back{padding:13px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px;background:transparent;border:1px solid var(--b1);color:var(--ts);font-family:var(--fb);transition:all .2s}
+.btn-back:hover{border-color:var(--b2);color:var(--txt)}
+.btn-next{flex:1;padding:13px 20px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;background:linear-gradient(135deg,var(--gdark),var(--gold));border:none;color:#08080A;font-family:var(--fd);letter-spacing:.3px;transition:all .2s}
+.btn-next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,197,71,0.25)}
+.btn-next:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ts);margin-bottom:7px}
+.inp{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:10px;color:var(--txt);font-family:var(--fb);font-size:14px;padding:13px 14px;transition:all .2s;outline:none}
+.inp::placeholder{color:var(--td)}
+.inp:focus{border-color:rgba(232,197,71,0.4);box-shadow:0 0 0 3px rgba(232,197,71,0.06);background:var(--s3)}
+.legal{font-size:10px;color:var(--td);margin-top:11px;line-height:1.5}
+.legal a{color:var(--ts);text-decoration:none}
+.consent{display:flex;align-items:flex-start;gap:9px;margin-top:14px;font-size:11px;line-height:1.55;color:var(--td)}
+.consent input{width:18px;height:18px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
+.consent a{color:var(--gold)}
+.honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.foot{text-align:center;margin-top:22px;font-size:11px;color:var(--td)}
+.foot a{color:var(--gold);text-decoration:none}
+.trust-row{display:flex;justify-content:center;gap:18px;margin-top:14px;font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:1px}
+.trust-row span::before{content:'✓ ';color:var(--gold);font-weight:700}
+@media(max-width:480px){.trust-row{gap:12px;font-size:9px}}
+
+/* Result screen */
+.res-wrap{text-align:center;padding:8px 0}
+.res-eyebrow{font-family:var(--fd);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.res-emoji{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:var(--gdim);border:1px solid rgba(212,170,64,.25);color:var(--gold);font-family:var(--fd);font-size:18px;font-weight:800;animation:pop .5s var(--ease)}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.res-title{font-family:var(--fd);font-size:28px;font-weight:800;letter-spacing:-.6px;margin-bottom:6px}
+.res-sub{font-size:13px;color:var(--ts);max-width:420px;margin:0 auto 22px;line-height:1.5}
+.res-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:20px;text-align:left;margin-bottom:18px;border-left:3px solid var(--gold)}
+.res-pkg{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.res-pkg-ico{width:48px;height:48px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.res-pkg-name{font-family:var(--fd);font-size:18px;font-weight:800;margin-bottom:1px}
+.res-pkg-price{font-size:12px;color:var(--td)}
+.res-features{list-style:none;display:flex;flex-direction:column;gap:6px}
+.res-features li{font-size:13px;color:var(--ts);padding-left:18px;position:relative}
+.res-features li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:700}
+.res-cta-primary{display:block;width:100%;padding:15px;border-radius:11px;background:linear-gradient(135deg,var(--gdark),var(--gold));color:#08080A;font-family:var(--fd);font-weight:800;font-size:15px;text-align:center;text-decoration:none;letter-spacing:.3px;margin-bottom:9px;transition:all .2s;border:none;cursor:pointer}
+.res-cta-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,197,71,0.25)}
+.res-cta-secondary{display:block;width:100%;padding:13px;border-radius:11px;background:transparent;border:1px solid var(--b1);color:var(--ts);font-family:var(--fb);font-weight:600;font-size:13px;text-align:center;text-decoration:none;cursor:pointer;transition:all .2s}
+.res-cta-secondary:hover{border-color:var(--b2);color:var(--txt)}
+.res-meta{margin-top:14px;font-size:11px;color:var(--td)}
+.match-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--green);background:rgba(62,207,142,0.1);border:1px solid rgba(62,207,142,0.25);padding:4px 10px;border-radius:20px;margin-bottom:14px}
+.save-note{margin:0 0 16px;padding:10px 12px;border-radius:10px;border:1px solid var(--b1);background:var(--s2);font-size:11px;line-height:1.5;color:var(--ts)}
+
+/* Loading */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(8,8,10,0.3);border-top-color:#08080A;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <a href="/" class="logo" style="text-decoration:none" aria-label="Coach Murray home">JM</a>
+    <span class="eyebrow">Find Your Plan · 60 seconds</span>
+    <h1>Which Coach Murray plan is right for you?</h1>
+    <p>Answer 5 quick questions and we'll match you with the package that fits your goals, lifestyle, and timeline.</p>
+  </div>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-meta">
+      <span class="pl" id="stepLabel">Question 1</span>
+      <span class="pr" id="stepPct">0%</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="card" id="card"></div>
+
+  <div class="trust-row">
+    <span>No card required</span>
+    <span>Rule-based match</span>
+    <span>Private by design</span>
+  </div>
+  <div class="foot">Questions? <a href="mailto:jonmurr.fit@gmail.com">Email Coach Murray</a></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+// ── PACKAGES ──
+// CRITICAL: stripeUrl MUST be a real Stripe checkout URL. Only paid users
+// reach /onboarding (Stripe's success_url should be configured to land there).
+var PACKAGES = {
+  nutrition:{ key:'nutrition', label:'Nutrition Plan', price:'$99/mo', emoji:'N', color:'#D4AA40',
+    features:['Custom calorie & macro targets','Food preference-based meal structure','Weekly check-ins & adjustments','Supplement protocol'],
+    stripeUrl:'https://buy.stripe.com/9B614ndTx6Hv7xz0i20000j' },
+  training:{ key:'training', label:'Training Program', price:'$119/mo', emoji:'T', color:'#D4AA40',
+    features:['Coach-built monthly programs','Built around your equipment','Progressive overload tracking','Exercise videos & cues'],
+    stripeUrl:'https://buy.stripe.com/4gM7sL16L0j70571m60000k' },
+  coaching:{ key:'coaching', label:'Full Coaching', price:'$179/mo', emoji:'C', color:'#D4AA40',
+    features:['Training + nutrition combined','Weekly check-ins with photo review','Direct coach access','Plan adjusts to your progress'],
+    stripeUrl:'https://buy.stripe.com/cNiaEX7v99TH2dffcW0000l' },
+  contest:{ key:'contest', label:'Contest Prep', price:'$249/mo', emoji:'P', color:'#D4AA40',
+    features:['Reverse-engineered prep timeline','Peak week protocol','Daily access during peak','Stage presentation guidance'],
+    stripeUrl:'https://buy.stripe.com/9B6eVdg1Fe9Xg45fcW0000m' }
+};
+
+// ── QUIZ DATA ──
+var QUESTIONS = [
+  {
+    id:'goal',
+    title:"What's your #1 goal right now?",
+    sub:"Pick the one that matters most. We'll build everything around this.",
+    options:[
+      { val:'lose_fat', emoji:'01', title:'Lose body fat', desc:'Cut calories, drop weight, see definition' },
+      { val:'build_muscle', emoji:'02', title:'Build muscle', desc:'Gain size, get stronger, eat more' },
+      { val:'recomp', emoji:'03', title:'Recomposition', desc:'Lose fat AND build muscle at the same time' },
+      { val:'compete', emoji:'04', title:'Compete on stage', desc:"Bodybuilding, physique, bikini — I want to step on stage" },
+      { val:'health', emoji:'05', title:'Improve health & energy', desc:'Feel better, sleep better, get stronger' }
+    ]
+  },
+  {
+    id:'experience',
+    title:'How long have you been training seriously?',
+    sub:"This determines how aggressive your plan can be.",
+    options:[
+      { val:'beginner', emoji:'01', title:'Less than 1 year', desc:'Newer to consistent training' },
+      { val:'intermediate', emoji:'02', title:'1–3 years', desc:'Have a foundation, ready to dial it in' },
+      { val:'advanced', emoji:'03', title:'3–5 years', desc:'Know my way around — need a real plan' },
+      { val:'elite', emoji:'04', title:'5+ years', desc:'Experienced, looking for next-level coaching' }
+    ]
+  },
+  {
+    id:'compete_intent',
+    title:"Are you considering competing in the next 12 months?",
+    sub:"Be honest — prep is a different beast than a regular cut.",
+    options:[
+      { val:'no', emoji:'01', title:'No competition plans', desc:"Just want to look and feel my best" },
+      { val:'maybe_future', emoji:'02', title:'Maybe someday', desc:'Open to it down the road, not yet' },
+      { val:'12mo_plan', emoji:'03', title:"Yes, planning a show in 6–12 months", desc:'Want to set up the foundation now' },
+      { val:'active_prep', emoji:'04', title:'Yes, prepping for a show now', desc:"Show is on the calendar — let's go" }
+    ]
+  },
+  {
+    id:'commitment',
+    title:'How many days per week can you train?',
+    sub:'Be realistic about your actual schedule, not your ideal one.',
+    options:[
+      { val:'2_3', emoji:'01', title:'2–3 days', desc:'Limited time — make every session count' },
+      { val:'4', emoji:'02', title:'4 days', desc:'A solid balanced split' },
+      { val:'5', emoji:'03', title:'5 days', desc:'Most-bang-for-buck training frequency' },
+      { val:'6_plus', emoji:'04', title:'6+ days', desc:"I'm in the gym almost every day" }
+    ]
+  },
+  {
+    id:'obstacle',
+    title:"What's your biggest obstacle right now?",
+    sub:'The one thing holding you back from your goal.',
+    options:[
+      { val:'consistency', emoji:'01', title:'Consistency & accountability', desc:"I know what to do — I just don't always do it" },
+      { val:'nutrition', emoji:'02', title:'Nutrition / dieting', desc:"Training is fine, eating is the struggle" },
+      { val:'training', emoji:'03', title:'Training program design', desc:"I'm spinning my wheels in the gym" },
+      { val:'plateau', emoji:'04', title:'Plateaued progress', desc:'Been doing the same thing too long with no results' },
+      { val:'time', emoji:'05', title:'Lack of time / structure', desc:'Need an efficient plan that fits my life' }
+    ]
+  }
+];
+
+// ── STATE ──
+var state = {
+  step:0,
+  answers:{},
+  email:'',
+  firstName:'',
+  consent:false
+};
+var totalSteps = QUESTIONS.length + 1; // +1 for capture screen
+
+// ── UTM CAPTURE ──
+function getUTM(){
+  var u = new URLSearchParams(location.search);
+  return {
+    utm_source: u.get('utm_source')||'',
+    utm_medium: u.get('utm_medium')||'',
+    utm_campaign: u.get('utm_campaign')||'',
+    utm_content: u.get('utm_content')||'',
+    utm_term: u.get('utm_term')||'',
+    referrer: document.referrer||'',
+    landing: location.href
+  };
+}
+var UTM = getUTM();
+
+// ── RECOMMENDATION ENGINE ──
+function recommend(a){
+  // Active prep → Contest, no question
+  if(a.compete_intent === 'active_prep') return 'contest';
+
+  // Show planned 6-12mo + experience >= intermediate → Contest
+  if(a.compete_intent === '12mo_plan' && (a.experience === 'advanced' || a.experience === 'elite')) return 'contest';
+
+  // 12mo plan but newer → Coaching first (build foundation)
+  if(a.compete_intent === '12mo_plan') return 'coaching';
+
+  // Goal = compete but not yet committed → Coaching (foundation)
+  if(a.goal === 'compete') return 'coaching';
+
+  // Consistency / accountability or plateau → Full Coaching
+  if(a.obstacle === 'consistency' || a.obstacle === 'plateau') return 'coaching';
+
+  // Time/structure obstacle + 4+ days → Coaching
+  if(a.obstacle === 'time' && (a.commitment === '4' || a.commitment === '5' || a.commitment === '6_plus')) return 'coaching';
+
+  // Pure nutrition struggle → Nutrition
+  if(a.obstacle === 'nutrition') return 'nutrition';
+
+  // Pure training struggle → Training
+  if(a.obstacle === 'training') return 'training';
+
+  // Recomp goal — needs both — Coaching
+  if(a.goal === 'recomp') return 'coaching';
+
+  // Health goal + low frequency → Coaching (general guidance)
+  if(a.goal === 'health' && a.commitment === '2_3') return 'coaching';
+
+  // Default fallback
+  return 'coaching';
+}
+
+function matchScore(a, pkg){
+  var s = 70;
+  if(pkg === 'contest' && a.compete_intent === 'active_prep') s = 99;
+  else if(pkg === 'contest' && a.compete_intent === '12mo_plan') s = 92;
+  else if(pkg === 'coaching' && a.obstacle === 'consistency') s = 96;
+  else if(pkg === 'coaching' && a.goal === 'recomp') s = 94;
+  else if(pkg === 'nutrition' && a.obstacle === 'nutrition') s = 95;
+  else if(pkg === 'training' && a.obstacle === 'training') s = 95;
+  else if(pkg === 'coaching' && (a.goal === 'health' || a.obstacle === 'time')) s = 90;
+  else s = 86;
+  return s;
+}
+
+// ── DOM HELPERS ──
+function g(id){ return document.getElementById(id); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── PROGRESS ──
+function renderProgress(){
+  var pct = Math.round((state.step / totalSteps) * 100);
+  g('progFill').style.width = pct + '%';
+  g('stepPct').textContent = pct + '%';
+  if(state.step < QUESTIONS.length){
+    g('stepLabel').textContent = 'Question ' + (state.step+1) + ' of ' + QUESTIONS.length;
+  } else if(state.step === QUESTIONS.length){
+    g('stepLabel').textContent = 'Almost there';
+  } else {
+    g('stepLabel').textContent = 'Your match';
+  }
+  var dots = g('dots'); dots.innerHTML = '';
+  for(var i=0; i<totalSteps; i++){
+    var d = document.createElement('div');
+    d.className = 'dot' + (i===state.step?' active':i<state.step?' done':'');
+    dots.appendChild(d);
+  }
+}
+
+// ── RENDER QUESTION ──
+function renderQuestion(){
+  var q = QUESTIONS[state.step];
+  var sel = state.answers[q.id];
+  var html = '<div class="q-num">Question '+(state.step+1)+' / '+QUESTIONS.length+'</div>'+
+    '<h2 class="q-title">'+esc(q.title)+'</h2>'+
+    '<p class="q-sub">'+esc(q.sub)+'</p>'+
+    '<div class="opts">';
+  q.options.forEach(function(o){
+    html += '<button type="button" class="opt'+(sel===o.val?' selected':'')+'" data-val="'+esc(o.val)+'">'+
+      '<div class="opt-emoji">'+o.emoji+'</div>'+
+      '<div class="opt-body"><div class="opt-title">'+esc(o.title)+'</div><div class="opt-desc">'+esc(o.desc)+'</div></div>'+
+      '<span class="opt-arr">→</span></button>';
+  });
+  html += '</div>'+
+    '<div class="btn-row">'+
+    (state.step>0?'<button class="btn-back" data-action="back">← Back</button>':'')+
+    '<button class="btn-next" id="btnNext" data-action="next" '+(sel?'':'disabled')+'>Continue →</button>'+
+    '</div>';
+  g('card').innerHTML = html;
+  bindOptions();
+}
+
+// ── RENDER CAPTURE SCREEN ──
+function renderCapture(){
+  var html = '<div class="q-num">Final Step</div>'+
+    '<h2 class="q-title">Where should we send your match?</h2>'+
+    '<p class="q-sub">Get your personalized recommendation + a free 5-day cutting blueprint, instantly.</p>'+
+    '<div class="field"><label for="fname">First Name</label>'+
+    '<input class="inp" id="fname" type="text" placeholder="Marcus" value="'+esc(state.firstName)+'" autocomplete="given-name"/></div>'+
+    '<div class="field"><label for="emailField">Email Address</label>'+
+    '<input class="inp" id="emailField" type="email" placeholder="your@email.com" value="'+esc(state.email)+'" autocomplete="email"/></div>'+
+    '<label class="consent" for="quizConsent"><input id="quizConsent" type="checkbox" '+(state.consent?'checked':'')+'/> <span>I agree that Coach Murray may save my answers, send this recommendation, and send related coaching information. I can unsubscribe at any time. <a href="/privacy">Privacy</a>.</span></label>'+
+    '<label class="honeypot" aria-hidden="true">Website<input id="quizWebsite" type="text" tabindex="-1" autocomplete="off"/></label>'+
+    '<div class="btn-row">'+
+    '<button class="btn-back" data-action="back">← Back</button>'+
+    '<button class="btn-next" id="btnNext" data-action="submit">See My Match →</button>'+
+    '</div>';
+  g('card').innerHTML = html;
+  setTimeout(function(){ var f=g('fname'); if(f) f.focus(); }, 50);
+}
+
+// ── RENDER RESULT ──
+function renderResult(pkgKey, saved){
+  var p = PACKAGES[pkgKey];
+  var score = matchScore(state.answers, pkgKey);
+  var name = state.firstName ? esc(state.firstName) : 'You';
+  var html = '<div class="res-wrap">'+
+    '<span class="match-badge">✓ '+score+'% Match</span>'+
+    '<div class="res-emoji">'+p.emoji+'</div>'+
+    '<div class="res-eyebrow">Your Recommended Plan</div>'+
+    '<h2 class="res-title">'+name+", we'd put you on:</h2>"+
+    '<p class="res-sub">This recommendation follows the matching rules shown in the quiz. Review the package details before purchasing.</p>'+
+    '<p class="save-note">'+(saved?'Your quiz result and contact preference were saved.':'Your recommendation is ready, but your contact details could not be saved. You can still review the package and open the blueprint below.')+'</p>'+
+    '<div class="res-card" style="border-left-color:'+p.color+'">'+
+    '<div class="res-pkg">'+
+    '<div class="res-pkg-ico" style="background:'+p.color+'22">'+p.emoji+'</div>'+
+    '<div><div class="res-pkg-name" style="color:'+p.color+'">'+esc(p.label)+'</div>'+
+    '<div class="res-pkg-price">'+esc(p.price)+'</div></div></div>'+
+    '<ul class="res-features">';
+  p.features.forEach(function(f){ html += '<li>'+esc(f)+'</li>'; });
+  html += '</ul></div>'+
+    '<a class="res-cta-primary" href="'+esc(p.stripeUrl)+'" data-action="convert">Get Started — '+esc(p.label)+' →</a>'+
+    '<a class="res-cta-secondary" href="/5-day-cutting-blueprint.pdf" target="_blank" rel="noopener">Open the free 5-day cutting blueprint</a>'+
+    '<p class="res-meta">Checkout is securely hosted by Stripe. Your onboarding link appears only after a completed payment.</p>'+
+    '</div>';
+  g('card').innerHTML = html;
+  // Hide top progress for clarity on result
+  g('progWrap').style.display = 'none';
+}
+
+// ── BIND ──
+function bindOptions(){
+  g('card').querySelectorAll('.opt').forEach(function(el){
+    el.addEventListener('click', function(){
+      var q = QUESTIONS[state.step];
+      state.answers[q.id] = el.dataset.val;
+      g('card').querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); });
+      el.classList.add('selected');
+      var btn = g('btnNext'); if(btn) btn.disabled = false;
+    });
+  });
+}
+
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  var a = btn.dataset.action;
+  if(a==='next')      goNext();
+  else if(a==='back') goBack();
+  else if(a==='submit') submitQuiz();
+  else if(a==='convert') return;
+});
+
+// ── NAV ──
+function goNext(){
+  if(state.step < QUESTIONS.length){
+    var q = QUESTIONS[state.step];
+    if(!state.answers[q.id]) return;
+    state.step++;
+    render();
+  }
+}
+function goBack(){
+  if(state.step > 0){
+    if(state.step === QUESTIONS.length+1) {
+      // From result back to capture
+      state.step = QUESTIONS.length;
+    } else {
+      state.step--;
+    }
+    g('progWrap').style.display = 'block';
+    render();
+  }
+}
+
+function render(){
+  renderProgress();
+  if(state.step < QUESTIONS.length){
+    renderQuestion();
+  } else if(state.step === QUESTIONS.length){
+    renderCapture();
+  }
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){}
+}
+
+// ── SUBMIT ──
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function submitQuiz(){
+  var fn = g('fname').value.trim();
+  var em = g('emailField').value.trim();
+  if(!fn){ g('fname').focus(); return; }
+  if(!isValidEmail(em)){ g('emailField').focus(); g('emailField').style.borderColor='rgba(248,113,113,0.5)'; return; }
+  var consent = g('quizConsent');
+  if(!consent || !consent.checked){ if(consent) consent.focus(); return; }
+  state.firstName = fn;
+  state.email = em;
+  state.consent = true;
+
+  var btn = g('btnNext');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Calculating...';
+
+  var pkgKey = recommend(state.answers);
+  var payload = {
+    kind:'quiz',
+    email: em,
+    firstName: fn,
+    lastName:'',
+    source:'coaching quiz',
+    marketingConsent:true,
+    website:(g('quizWebsite')||{}).value||'',
+    metadata:{
+      goal:state.answers.goal,
+      experience:state.answers.experience,
+      competing_intent:state.answers.compete_intent,
+      weekly_commitment:state.answers.commitment,
+      biggest_obstacle:state.answers.obstacle,
+      recommended_package:pkgKey,
+      match_score:String(matchScore(state.answers,pkgKey)),
+      utm_source:UTM.utm_source,
+      utm_medium:UTM.utm_medium,
+      utm_campaign:UTM.utm_campaign
+    }
+  };
+
+  fetch('/.netlify/functions/lead-submit', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function(r){
+    if(!r.ok) throw new Error('save failed');
+    state.step++;
+    renderResult(pkgKey, true);
+  }).catch(function(){
+    state.step++;
+    renderResult(pkgKey, false);
+  });
+}
+
+// ── INIT ──
+render();
+
+})();
+</script>
+</body>
+</html>
