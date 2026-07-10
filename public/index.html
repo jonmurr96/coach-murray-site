@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Coach Murray - Online Fitness Coaching</title>
+<meta name="description" content="One-to-one online fitness coaching with custom training, practical nutrition, weekly check-ins, and direct coach support."/>
+<link rel="icon" href="data:,"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin="anonymous"/>
@@ -17,7 +19,7 @@
 :root{
   --bg:#050507;--bgDeep:#020203;--surface:#0c0c10;
   --glass:rgba(255,255,255,0.03);--gb:rgba(255,255,255,0.06);
-  --txt:#F4F1EA;--ts:rgba(255,255,255,0.6);--tm:rgba(255,255,255,0.28);
+  --txt:#F4F1EA;--ts:rgba(255,255,255,0.72);--tm:#96938B;
   --gold:#D4AA40;--goldL:#F0D070;--goldDim:rgba(212,170,64,0.1);--goldB:rgba(212,170,64,0.2);
   --green:#3DDC84;--greenDim:rgba(61,220,132,0.08);
   --blue:#4EA8DE;--pink:#E8647C;
@@ -627,7 +629,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
 </script>
 <nav id="nav">
   <div class="nav-inner">
-    <button class="nav-logo" onclick="cmScroll('about')" aria-label="Coach Murray home and about section">
+    <button class="nav-logo" onclick="cmScroll('about')">
       <div class="nav-mark">JM</div>
       <div><div class="nav-brand">COACH MURRAY</div><div class="nav-sub">Online Coaching</div></div>
     </button>
@@ -640,6 +642,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
     <button class="nav-mobile-cta" onclick="cmScroll('apply')">Apply</button>
   </div>
 </nav>
+<main>
 <section class="hero">
   <div class="orb" style="--ox:-10%;--oy:15%;--blur:140px;width:500px;height:500px;background:radial-gradient(circle,rgba(212,170,64,.06),transparent 70%);left:0;top:0;animation-duration:12s"></div>
   <div class="orb" style="--ox:70%;--oy:60%;--blur:120px;width:400px;height:400px;background:radial-gradient(circle,rgba(78,168,222,.04),transparent 70%);left:0;top:0;animation-duration:15s"></div>
@@ -651,7 +654,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
     <div>
       <div class="live-pill"><span class="live-dot"></span>1:1 online coaching · Huntsville, AL</div>
       <div class="hero-eyebrow"><div class="hero-eyebrow-line"></div><span class="hero-eyebrow-text">Online Coaching</span></div>
-      <h1 data-reveal="letters"><span class="h1-plain">Build the</span><span class="h1-shimmer aberrant">body you deserve.</span></h1>
+      <h1><span class="h1-plain">Build the</span><span class="h1-shimmer aberrant">body you deserve.</span></h1>
       <p class="hero-sub">Science-backed programming. Personalized nutrition. Weekly accountability. Every plan built from scratch — for <em>you</em>.</p>
       <div class="hero-btns">
         <button class="btn-primary" onclick="window.location.href='/quiz.html'" data-magnetic data-magnetic-radius="80" data-magnetic-travel="10">Find Your Plan — Free Quiz <span style="font-size:16px">→</span></button>
@@ -691,7 +694,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
         <div class="about-card">
           <div class="about-card-corner"></div>
           <div style="position:relative;z-index:1;text-align:center">
-            <img src="./profile.jpg" alt="Coach Jonathon Murray" class="about-photo" width="715" height="902" loading="lazy" decoding="async" onerror="this.style.display='none'"/>
+            <img src="./profile.jpg" alt="Coach Jonathon Murray" class="about-photo" width="320" height="403" loading="lazy" decoding="async" onerror="this.style.display='none'"/>
             <div class="about-name">Jonathon Murray</div>
             <div class="about-title-line">Competitive Bodybuilder</div>
             <div class="about-location">Huntsville, Alabama</div>
@@ -953,6 +956,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
     </div>
   </div>
 </section>
+</main>
 <!-- FLOATING CTA -->
 <a href="#apply" onclick="cmScroll('apply');return false;" class="float-cta" id="floatCta" aria-label="Apply Now" data-magnetic data-magnetic-radius="80" data-magnetic-travel="8">
   Apply Now

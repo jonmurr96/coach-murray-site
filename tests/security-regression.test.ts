@@ -35,6 +35,14 @@ describe("security regressions", () => {
     expect(quiz).toContain("5-day-cutting-blueprint.pdf");
   });
 
+  it("keeps the landing page landmark, metadata, and stable hero rendering", () => {
+    const landing = readFileSync(path.join(root, "public/index.html"), "utf8");
+    expect(landing).toMatch(/<meta name="description"/);
+    expect(landing).toContain("<main>");
+    expect(landing).not.toContain('<h1 data-reveal="letters"');
+    expect(landing).toContain("--tm:#96938B");
+  });
+
   it("publishes only the generated dist directory", () => {
     const netlify = readFileSync(path.join(root, "netlify.toml"), "utf8");
     expect(netlify).toContain('publish = "dist"');
