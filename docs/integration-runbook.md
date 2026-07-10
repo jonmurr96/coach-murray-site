@@ -26,10 +26,12 @@
 
 ## 4. Netlify
 
-1. Add all variables from `.env.example` to the `coach-murray` site using production scopes.
-2. Run `pnpm verify` locally.
-3. Deploy a preview and exercise the QA matrix before promoting it.
-4. Confirm security headers, functions, and redirects from the deployed origin.
+1. Resolve the audited project split in `docs/deployment-state.md`: `coach-murray` is the current manual production site while `coachmurray` is Git-linked.
+2. Connect the approved canonical Netlify project to `jonmurr96/coach-murray-site` and preserve the intended public domain/aliases.
+3. Add all variables from `.env.example` using production scopes.
+4. Run `pnpm verify` locally.
+5. Deploy a preview and exercise the QA matrix before promoting it.
+6. Confirm security headers, functions, redirects, and the exact public origin from the deployed site.
 
 ## 5. Future integrations
 
