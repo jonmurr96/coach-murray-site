@@ -24,8 +24,9 @@ The Playwright gate builds the production bundle, checks public routes, runs
 automated WCAG A/AA scans, detects mobile horizontal overflow, and verifies that
 onboarding and protected dashboards remain closed when production credentials
 are absent. It also checks distinct client/coach sign-in entry points, protected
-account routes, and mobile containment. GitHub Actions runs both commands on every pull
-request.
+account routes, and mobile containment. Run both commands before merging each
+pull request; Netlify independently validates the deploy preview, redirects,
+and headers.
 
 The Netlify production build publishes only `dist`; historical standalone files
 at the repository root are not deployed.
