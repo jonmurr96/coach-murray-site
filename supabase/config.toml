@@ -25,6 +25,7 @@ enabled = true
 site_url = "https://coach-murray.netlify.app"
 additional_redirect_urls = [
   "https://coach-murray.netlify.app/account/confirm**",
+  "https://deploy-preview-1--coachmurray.netlify.app/account/confirm**",
   "https://coach-murray.netlify.app/account/setup",
   "https://coach-murray.netlify.app/account/reset",
 ]
