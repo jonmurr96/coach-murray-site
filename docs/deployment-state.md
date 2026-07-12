@@ -8,7 +8,7 @@ State captured July 12, 2026.
 - Production branch remains `main`; no production promotion was performed.
 - Release candidate branch: `codex/coach-os-v2`
 - Draft review: pull request #1
-- Candidate commit at this audit: `84f8787`
+- The draft pull request is the source of truth for the current candidate commit.
 
 ## Netlify
 

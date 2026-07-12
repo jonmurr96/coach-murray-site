@@ -83,6 +83,15 @@ Exercise these checks on a deploy preview with test-mode Stripe and a non-produc
 9. Dashboard, Coach OS, setup, recovery, and confirmation pages return `private, no-store`, `noindex`, `no-referrer`, and the route-specific self-only script CSP.
 10. Run `pnpm verify` and `pnpm test:e2e`, then inspect Netlify function logs, Supabase Auth audit logs, Stripe webhook delivery, and Resend delivery without recording secrets or health-form payloads.
 
+The ignored local `.env` can also drive the read-only release guard:
+
+```bash
+pnpm release:check:candidate
+pnpm release:check
+```
+
+The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, Stripe allowlist and deployed pricing-link mapping, disabled webhook safety, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function boundaries. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
+
 ## 6. Future integrations
 
 - Calendar, analytics, AI drafting, file uploads, and lifecycle automations intentionally remain off until a provider and data/consent policy are approved.

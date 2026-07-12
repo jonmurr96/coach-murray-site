@@ -11,6 +11,8 @@
     "test:e2e": "corepack pnpm build && playwright test",
     "test:watch": "vitest",
     "provision:coach": "node scripts/provision-coach.mjs",
+    "release:check": "node scripts/release-readiness.mjs --phase production",
+    "release:check:candidate": "node scripts/release-readiness.mjs --phase candidate",
     "verify": "corepack pnpm check && corepack pnpm test && corepack pnpm build",
     "format": "prettier --write client netlify shared tests *.json *.ts *.md"
   },
