@@ -46,7 +46,7 @@ export async function sendPasswordReset(
 ) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Authentication is not configured yet.");
-  const redirect = new URL("/account/reset", window.location.origin);
+  const redirect = new URL("/account/confirm", window.location.origin);
   redirect.searchParams.set("next", destination);
   const { error } = await client.auth.resetPasswordForEmail(
     email.trim().toLowerCase(),

@@ -741,6 +741,7 @@ function EmailActionConfirmation() {
     tokenHash.length >= 16 &&
     tokenHash.length <= 1_024 &&
     /^[A-Za-z0-9._~-]+$/.test(tokenHash);
+  const resetNext = resetDestination();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -752,7 +753,9 @@ function EmailActionConfirmation() {
       await verifyEmailToken(tokenHash, validType);
       window.history.replaceState(window.history.state, "", "/account/confirm");
       window.location.replace(
-        validType === "invite" ? "/account/setup" : "/account/reset"
+        validType === "invite"
+          ? "/account/setup"
+          : `/account/reset?next=${encodeURIComponent(resetNext)}`
       );
     } catch {
       setError(

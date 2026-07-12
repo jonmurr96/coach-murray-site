@@ -186,7 +186,7 @@ export async function resendClientSetupInvite(
   >;
   try {
     invite = await supabase.auth.admin.inviteUserByEmail(emailResult.data, {
-      redirectTo: `${portalOrigin}/account/setup`,
+      redirectTo: `${portalOrigin}/account/confirm`,
     });
   } catch {
     await releaseClaim();

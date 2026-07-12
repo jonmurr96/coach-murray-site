@@ -205,7 +205,7 @@ describe("coach account setup invitation resend", () => {
 
     expect(result).toEqual({ invitedAt: now.toISOString() });
     expect(fake.inviteUserByEmail).toHaveBeenCalledWith("client@example.com", {
-      redirectTo: "https://coach.example/account/setup",
+      redirectTo: "https://coach.example/account/confirm",
     });
     expect(fake.order).toEqual(["claim", "invite"]);
     expect(fake.updateBuilder.is).toHaveBeenCalledWith(

@@ -61,7 +61,7 @@ export async function ensureClientAccountInvitation(
     claimed = true;
 
     const invite = await supabase.auth.admin.inviteUserByEmail(input.email, {
-      redirectTo: `${input.portalOrigin}/account/setup`,
+      redirectTo: `${input.portalOrigin}/account/confirm`,
     });
     if (!invite.error) return { accountState: "invited", warnings: [] };
 

@@ -211,6 +211,14 @@ create index if not exists progress_client_date_idx on public.progress_entries (
 create index if not exists leads_status_date_idx on public.leads (status, created_at desc);
 create index if not exists lead_submissions_lead_date_idx on public.lead_submissions (lead_id, submitted_at desc);
 create index if not exists client_resources_resource_idx on public.client_resources (resource_id, client_id);
+create index if not exists intake_submissions_client_idx on public.intake_submissions (client_id);
+create index if not exists messages_sender_user_idx on public.messages (sender_user_id);
+create index if not exists nutrition_plans_client_idx on public.nutrition_plans (client_id);
+create index if not exists nutrition_plans_program_idx on public.nutrition_plans (program_id);
+create index if not exists programs_coach_user_idx on public.programs (coach_user_id);
+create index if not exists progress_entries_check_in_idx on public.progress_entries (check_in_id);
+create index if not exists purchases_client_idx on public.purchases (client_id);
+create index if not exists workouts_program_idx on public.workouts (program_id);
 
 drop trigger if exists client_profiles_set_updated_at on public.client_profiles;
 create trigger client_profiles_set_updated_at before update on public.client_profiles for each row execute function public.set_updated_at();
@@ -261,6 +269,8 @@ begin
   return new;
 end;
 $$;
+
+revoke all on function public.handle_auth_user_link() from public, anon, authenticated;
 
 drop trigger if exists coach_os_link_auth_user on auth.users;
 create trigger coach_os_link_auth_user after insert or update of email, email_confirmed_at, encrypted_password on auth.users for each row execute function public.handle_auth_user_link();
@@ -581,62 +591,50 @@ alter table public.library_resources enable row level security;
 alter table public.client_resources enable row level security;
 
 create policy "clients read own profile" on public.client_profiles for select to authenticated using (
-  user_id = auth.uid() and account_setup_completed_at is not null
+  user_id = (select auth.uid()) and account_setup_completed_at is not null
 );
-create policy "coaches manage profiles" on public.client_profiles for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own purchases" on public.purchases for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage purchases" on public.purchases for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own intake" on public.intake_submissions for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage intake" on public.intake_submissions for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own active programs" on public.programs for select to authenticated using (
   status = 'active' and published_at is not null and
-  client_id in (select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null)
+  client_id in (select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null)
 );
-create policy "coaches manage programs" on public.programs for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own active workouts" on public.workouts for select to authenticated using (
-  client_id in (select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null) and
+  client_id in (select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null) and
   program_id in (select id from public.programs where status = 'active' and published_at is not null)
 );
-create policy "coaches manage workouts" on public.workouts for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own active nutrition" on public.nutrition_plans for select to authenticated using (
   status = 'active' and published_at is not null and
-  client_id in (select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null)
+  client_id in (select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null)
 );
-create policy "coaches manage nutrition" on public.nutrition_plans for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own checkins" on public.check_ins for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage checkins" on public.check_ins for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own progress" on public.progress_entries for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage progress" on public.progress_entries for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own messages" on public.messages for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage messages" on public.messages for all to authenticated using (public.is_coach()) with check (public.is_coach());
-create policy "coaches manage leads" on public.leads for all to authenticated using (public.is_coach()) with check (public.is_coach());
-create policy "coaches manage lead submissions" on public.lead_submissions for all to authenticated using (public.is_coach()) with check (public.is_coach());
+create policy "deny direct lead access" on public.leads for all to authenticated using (false) with check (false);
+create policy "deny direct lead submission access" on public.lead_submissions for all to authenticated using (false) with check (false);
 create policy "clients read assigned resources" on public.library_resources for select to authenticated using (
   exists (
     select 1
     from public.client_resources cr
     join public.client_profiles cp on cp.id = cr.client_id
     where cr.resource_id = library_resources.id
-      and cp.user_id = auth.uid()
+      and cp.user_id = (select auth.uid())
       and cp.account_setup_completed_at is not null
   )
 );
-create policy "coaches manage resources" on public.library_resources for all to authenticated using (public.is_coach()) with check (public.is_coach());
 create policy "clients read own assignments" on public.client_resources for select to authenticated using (client_id in (
-  select id from public.client_profiles where user_id = auth.uid() and account_setup_completed_at is not null
+  select id from public.client_profiles where user_id = (select auth.uid()) and account_setup_completed_at is not null
 ));
-create policy "coaches manage assignments" on public.client_resources for all to authenticated using (public.is_coach()) with check (public.is_coach());
-
 -- Assign the initial owner role with a privileged admin workflow after the owner
 -- has signed in once. Never accept this role from user_metadata or a browser form:
 -- update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"owner"}'::jsonb where email = 'OWNER_EMAIL';

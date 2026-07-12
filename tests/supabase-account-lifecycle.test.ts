@@ -10,6 +10,18 @@ const migrationPath = path.join(
   root,
   "supabase/migrations/20260710000000_coach_os_canonical.sql"
 );
+const hardeningMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712180000_security_performance_hardening.sql"
+);
+const coachRlsMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712183000_server_mediated_coach_rls.sql"
+);
+const leadRlsMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712184500_deny_direct_lead_access.sql"
+);
 const signatureHash = "a".repeat(64);
 
 let db: PGlite;
@@ -61,6 +73,9 @@ beforeAll(async () => {
     "-- gen_random_uuid is built into the PGlite PostgreSQL validation runtime"
   );
   await db.exec(migration);
+  await db.exec(readFileSync(hardeningMigrationPath, "utf8"));
+  await db.exec(readFileSync(coachRlsMigrationPath, "utf8"));
+  await db.exec(readFileSync(leadRlsMigrationPath, "utf8"));
 }, 15_000);
 
 afterAll(async () => {

@@ -74,7 +74,7 @@ describe("paid onboarding account invitation boundary", () => {
     ).resolves.toEqual({ accountState: "invited", warnings: [] });
     expect(fake.order).toEqual(["claim", "invite"]);
     expect(fake.inviteUserByEmail).toHaveBeenCalledWith("client@example.com", {
-      redirectTo: "https://coach.example/account/setup",
+      redirectTo: "https://coach.example/account/confirm",
     });
     expect(fake.builder.is).toHaveBeenCalledWith("account_invited_at", null);
   });

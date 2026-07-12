@@ -1,0 +1,90 @@
+# Hosted configuration for the Coach Murray production Supabase project.
+# Apply intentionally through `supabase config push --project-ref <ref>` and
+# review each remote diff before accepting it.
+project_id = "coach-murray"
+
+[api]
+enabled = true
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+major_version = 17
+
+[db.network_restrictions]
+enabled = false
+
+# Storage is not part of the current product flow. Keeping this disabled in
+# config also prevents `config push` from changing the hosted Storage service.
+[storage]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "https://coach-murray.netlify.app"
+additional_redirect_urls = [
+  "https://coach-murray.netlify.app/account/confirm**",
+  "https://coach-murray.netlify.app/account/setup",
+  "https://coach-murray.netlify.app/account/reset",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = false
+enable_anonymous_sign_ins = false
+enable_manual_linking = false
+minimum_password_length = 12
+password_requirements = "lower_upper_letters_digits"
+
+[auth.rate_limit]
+email_sent = 30
+sms_sent = 30
+anonymous_users = 30
+token_refresh = 150
+sign_in_sign_ups = 30
+token_verifications = 30
+web3 = 30
+
+[auth.email]
+# The email/password provider stays enabled for invited clients and returning
+# users. Global auth.enable_signup above blocks public self-registration.
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = true
+max_frequency = "60s"
+otp_length = 8
+otp_expiry = 3600
+
+# Custom SMTP is deliberately omitted until jonmurr.fit passes Resend DNS
+# verification. Leaving the section absent preserves the hosted SMTP setting.
+# Supabase's free tier also rejects hosted template changes while the default
+# mailer is active. Uncomment these blocks together with a verified SMTP block.
+# [auth.email.template.invite]
+# subject = "Create your Coach Murray account"
+# content_path = "./supabase/templates/invite.html"
+#
+# [auth.email.template.recovery]
+# subject = "Reset your Coach Murray password"
+# content_path = "./supabase/templates/recovery.html"
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+template = "Your code is {{ .Code }}"
+max_frequency = "5s"
+
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+otp_length = 6
+template = "Your code is {{ .Code }}"
+max_frequency = "5s"

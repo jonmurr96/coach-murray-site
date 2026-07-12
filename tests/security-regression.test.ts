@@ -78,5 +78,62 @@ describe("security regressions", () => {
       /on conflict \(purchase_id\) do update set intake_payload/i
     );
     expect(migration).toContain("record_lead_submission");
+    expect(migration).toContain(
+      "revoke all on function public.handle_auth_user_link() from public, anon, authenticated"
+    );
+    expect(migration).toContain("user_id = (select auth.uid())");
+    expect(migration).toContain("intake_submissions_client_idx");
+    expect(migration).toContain("workouts_program_idx");
+    expect(migration).not.toContain('create policy "coaches manage');
+    expect(migration).toContain('create policy "deny direct lead access"');
+  });
+
+  it("keeps hosted auth invite-only and email actions scanner-safe", () => {
+    const config = readFileSync(
+      path.join(root, "supabase/config.toml"),
+      "utf8"
+    );
+    const invite = readFileSync(
+      path.join(root, "supabase/templates/invite.html"),
+      "utf8"
+    );
+    const recovery = readFileSync(
+      path.join(root, "supabase/templates/recovery.html"),
+      "utf8"
+    );
+    const onboarding = readFileSync(
+      path.join(root, "netlify/functions/submit-onboarding.mts"),
+      "utf8"
+    );
+    const adminAction = readFileSync(
+      path.join(root, "netlify/functions/admin-action.mts"),
+      "utf8"
+    );
+    const browserAuth = readFileSync(
+      path.join(root, "client/src/lib/auth.ts"),
+      "utf8"
+    );
+
+    expect(config).toContain(
+      'site_url = "https://coach-murray.netlify.app"'
+    );
+    expect(config).toContain("enable_signup = false");
+    expect(config).toContain("minimum_password_length = 12");
+    expect(config).toContain(
+      'password_requirements = "lower_upper_letters_digits"'
+    );
+    expect(config).toContain(
+      '"https://coach-murray.netlify.app/account/confirm**"'
+    );
+    expect(invite).toContain(
+      "{{ .RedirectTo }}#token_hash={{ .TokenHash }}&amp;type=invite"
+    );
+    expect(recovery).toContain(
+      "{{ .RedirectTo }}#token_hash={{ .TokenHash }}&amp;type=recovery"
+    );
+    expect(`${invite}\n${recovery}`).not.toContain(".ConfirmationURL");
+    expect(onboarding).toContain("/account/confirm");
+    expect(adminAction).toContain("/account/confirm");
+    expect(browserAuth).toContain('new URL("/account/confirm"');
   });
 });
