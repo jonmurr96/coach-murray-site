@@ -1,34 +1,68 @@
 # Audited Deployment State
 
-State captured July 10, 2026.
+State captured July 12, 2026.
 
 ## GitHub
 
 - Repository: `jonmurr96/coach-murray-site`
-- Production branch before this work: `main` at `0ae25fc`
-- Rebuilt source branch: `codex/coach-os-v2`
+- Production branch remains `main`; no production promotion was performed.
+- Release candidate branch: `codex/coach-os-v2`
 - Draft review: pull request #1
+- Candidate commit at this audit: `84f8787`
 
 ## Netlify
 
-Three existing projects were found:
+The existing project split is preserved deliberately:
 
-| Project                | Site ID                                | Role before v2                                                                       |
-| ---------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| `coach-murray`         | `78da1788-ca6c-46c8-abfa-442175f35bba` | Current public site at `coach-murray.netlify.app`; manual/API deploy, not Git-linked |
-| `coach-murray-landing` | `965d4619-c465-445f-88c1-f3fc8a73be30` | Landing/redirect project                                                             |
-| `coachmurray`          | `551c227c-d278-4b9d-b744-d7d6f46c5f1c` | Legacy Git-linked project for `jonmurr96/coach-murray-site`                          |
+| Project                | Site ID                                | Current role                                                                 |
+| ---------------------- | -------------------------------------- | ---------------------------------------------------------------------------- |
+| `coach-murray`         | `78da1788-ca6c-46c8-abfa-442175f35bba` | Public production origin; still serving its prior deploy                     |
+| `coach-murray-landing` | `965d4619-c465-445f-88c1-f3fc8a73be30` | Existing landing/redirect project; unchanged                                 |
+| `coachmurray`          | `551c227c-d278-4b9d-b744-d7d6f46c5f1c` | Isolated live candidate at `https://coachmurray.netlify.app` and PR previews |
 
-The draft pull request deploy preview runs on the Git-linked `coachmurray` project. It is not the current `coach-murray` production origin. Before production promotion, choose one canonical Netlify project and connect the repository, domains, environment variables, Stripe redirect, and webhook to that same project. The recommended path is to preserve the current public `coach-murray` identity while making its deploy source reproducible from the GitHub repository.
+The candidate was uploaded from the release branch through Netlify's managed deploy path. Its static routes, redirects, headers, Functions, Supabase connection, Stripe connection, client role boundary, and coach role boundary have been exercised. Production `coach-murray` was not overwritten.
 
-Both relevant Netlify projects returned no configured environment variables during the audit. Production promotion is intentionally withheld until the required values in `.env.example` exist.
+All 11 currently usable variables from `.env.example` are configured on `coach-murray`; `TRANSACTIONAL_FROM_EMAIL` is intentionally absent because no Resend domain is verified. The same runtime contract is present on the isolated candidate. The team's current Netlify plan accepts ordinary encrypted-at-rest environment variables, while the stricter Secrets Controller context/scope combination used in the first attempt was not exposed to Functions.
 
 ## Supabase
 
-The two project references embedded in the legacy pages were not accessible through the connected Supabase account. The accessible projects in that account were inactive and had different project references. No migration was applied and no new paid project was created.
+- Canonical project: `Coach-Murray`
+- Project ref: `emowlnxzcemeteiuftaj`
+- State: active and healthy
+- Canonical schema plus three security/performance follow-up migrations are applied.
+- All public tables have RLS. Client reads are scoped to the signed user and published/assigned data; Coach OS uses role-checked Netlify Functions rather than browser-wide coach policies.
+- Hosted Auth is invite-only, anonymous sign-in is disabled, password minimum is 12 characters with lowercase/uppercase/digit requirements, refresh-token rotation is enabled, and password changes require recent authentication.
+- Production and candidate confirmation URLs are allowlisted. `supabase config push` reports remote Auth, API, and DB configuration up to date.
+- The configured owner email exists as a confirmed Auth user with signed `app_metadata.role = owner`. A one-time password-setup email was sent through Resend's account-only test sender.
+- Supabase's security advisor has one remaining plan-gated warning: leaked-password/HIBP protection requires Supabase Pro. An API attempt to enable it returned `402`.
 
-The SQL migration in `supabase/migrations` is ready for one approved canonical project. Applying it and setting the Netlify variables are external activation steps, not code changes.
+## Stripe
+
+- Four live Payment Link IDs are stored in the server allowlist.
+- A live webhook endpoint exists at `https://coach-murray.netlify.app/.netlify/functions/stripe-webhook` with exactly the required five event types.
+- The endpoint remains disabled until production promotion. Its signing secret is stored outside Git.
+- A real completed session from an allowlisted Payment Link returned `200 verified` through the candidate Function.
+- Signed and invalid-signature webhook probes returned `200` and `400`, respectively.
+- Live Payment Link redirects still point to the existing production onboarding URLs and do not yet include `{CHECKOUT_SESSION_ID}`. They must be changed only when the new production deploy is ready.
+
+## Email release gate
+
+`jonmurr.fit` currently returns DNS `NXDOMAIN`. Resend reports the domain, DKIM, and SPF records as failed. Because Supabase's free tier rejects hosted template changes while its default mailer is active, production SMTP and the scanner-safe invitation/recovery templates cannot be activated until one of these is true:
+
+1. `jonmurr.fit` is registered and its Resend DNS records verify, or
+2. another owned, verified sending domain is supplied.
+
+The branded scanner-safe templates already exist in `supabase/templates`. Do not enable live Payment Link redirects, the Stripe webhook, or the new production deploy while paid-client invitation delivery remains unavailable.
+
+## Candidate verification evidence
+
+- `pnpm verify`: 73 tests plus production build passed.
+- `pnpm test:e2e`: 24 Chromium accessibility, access-boundary, and mobile-containment checks passed.
+- Trusted candidate lead submission wrote one lead and one submission to Supabase; the test record was verified and deleted.
+- Untrusted origin, anonymous session, and malformed checkout probes failed closed with `403`, `401`, and `400`.
+- Ephemeral browser clients reached `/dashboard`; ephemeral owner-role coaches reached `/admin`; cross-role APIs were denied; all test users and data were removed.
+- Landing, client sign-in, coach sign-in, setup, confirmation, onboarding, dashboard, and admin routes rendered without console errors or horizontal overflow.
 
 ## OpenAI Sites
 
-No existing Sites project was returned for the connected account, and there was no local `.openai/hosting.json`. No additional Sites project was created because Netlify and GitHub are the established deployment path for this product.
+No Sites project is part of the production path. Netlify and GitHub remain the established deployment system.

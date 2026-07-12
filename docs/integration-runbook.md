@@ -2,18 +2,17 @@
 
 ## 1. Supabase
 
-1. Give the connected Supabase account access to the intended production project, or select one approved project.
+1. Use the approved `Coach-Murray` project (`emowlnxzcemeteiuftaj`).
 2. Before applying the migration to an existing roster, run `select lower(email), count(*) from public.client_profiles group by lower(email) having count(*) > 1;` and resolve any case-variant duplicates deliberately. The migration enforces one case-insensitive client identity per email.
-3. Apply `supabase/migrations/20260710000000_coach_os_canonical.sql` through the Supabase CLI or SQL editor.
-4. In Auth settings, set the Site URL to the exact HTTPS origin used by `SITE_URL`. Allow redirects to `/account/setup`, `/account/confirm`, and `/account/reset` on that same origin. Do not allow wildcard external origins.
-5. Disable public user signups and anonymous sign-ins. Keep email confirmation enabled. Set the project password minimum to at least 12 characters and enable available password-compromise checks.
+3. Apply every migration in `supabase/migrations` in timestamp order, then run both Supabase security and performance advisors.
+4. Push `supabase/config.toml` and confirm the production Site URL plus the exact production/candidate `/account/confirm**` redirects. Remove candidate URLs after acceptance if the preview is retired.
+5. Keep public user signups and anonymous sign-ins disabled. Keep the email/password provider and email confirmation enabled. Passwords require at least 12 characters with lowercase, uppercase, and digits. Enable leaked-password protection when the project is upgraded to Supabase Pro.
 6. Configure production SMTP before inviting any client. Replace the Supabase **Invite user** and **Reset password** email links with the scanner-safe templates below. The first browser page does not consume the token; the human must select **Continue securely**.
 
    Invite-user link:
 
    ```html
-   <a
-     href="{{ .SiteURL }}/account/confirm#token_hash={{ .TokenHash }}&amp;type=invite"
+   <a href="{{ .RedirectTo }}#token_hash={{ .TokenHash }}&amp;type=invite"
      >Create your Coach Murray account</a
    >
    ```
@@ -21,8 +20,7 @@
    Password-recovery link:
 
    ```html
-   <a
-     href="{{ .SiteURL }}/account/confirm#token_hash={{ .TokenHash }}&amp;type=recovery"
+   <a href="{{ .RedirectTo }}#token_hash={{ .TokenHash }}&amp;type=recovery"
      >Reset your Coach Murray password</a
    >
    ```
