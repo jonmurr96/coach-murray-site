@@ -66,4 +66,23 @@ describe("browser API client", () => {
       })
     );
   });
+
+  it("loads the coach resource library through its dedicated boundary", async () => {
+    const payload = { resources: [], clients: [] };
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify(payload), { status: 200 })
+      );
+
+    await expect(api.getAdminLibrary()).resolves.toEqual(payload);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/.netlify/functions/admin-library",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+      })
+    );
+  });
 });

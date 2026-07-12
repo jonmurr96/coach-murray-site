@@ -22,6 +22,10 @@ const leadRlsMigrationPath = path.join(
   root,
   "supabase/migrations/20260712184500_deny_direct_lead_access.sql"
 );
+const libraryMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712220000_library_resource_workflow.sql"
+);
 const signatureHash = "a".repeat(64);
 
 let db: PGlite;
@@ -76,6 +80,7 @@ beforeAll(async () => {
   await db.exec(readFileSync(hardeningMigrationPath, "utf8"));
   await db.exec(readFileSync(coachRlsMigrationPath, "utf8"));
   await db.exec(readFileSync(leadRlsMigrationPath, "utf8"));
+  await db.exec(readFileSync(libraryMigrationPath, "utf8"));
 }, 15_000);
 
 afterAll(async () => {
@@ -208,5 +213,48 @@ describe("Supabase account lifecycle migration", () => {
     ).resolves.toMatchObject({
       rows: [{ user_id: null, account_setup_completed_at: null }],
     });
+  });
+
+  it("enforces safe resource links and cascades client assignments", async () => {
+    const client = await db.query<{ id: string }>(
+      "insert into public.client_profiles (first_name, last_name, email) values ('Library', 'Client', 'library@example.com') returning id"
+    );
+    const resource = await db.query<{ id: string }>(
+      "insert into public.library_resources (title, kind, url) values ('Movement guide', 'guide', 'https://resources.example.org/movement') returning id"
+    );
+    const clientId = client.rows[0]?.id;
+    const resourceId = resource.rows[0]?.id;
+    await db.query(
+      "insert into public.client_resources (client_id, resource_id) values ($1, $2)",
+      [clientId, resourceId]
+    );
+
+    for (const [kind, url] of [
+      ["upload", "https://resources.example.org/file"],
+      ["guide", "http://resources.example.org/file"],
+      ["guide", "javascript:alert(1)"],
+    ]) {
+      await expect(
+        db.query(
+          "insert into public.library_resources (title, kind, url) values ('Unsafe', $1, $2)",
+          [kind, url]
+        )
+      ).rejects.toMatchObject({ code: "23514" });
+    }
+
+    await expect(
+      db.query(
+        "select count(*)::int as count from pg_trigger where tgname = 'library_resources_set_updated_at' and not tgisinternal"
+      )
+    ).resolves.toMatchObject({ rows: [{ count: 1 }] });
+    await db.query("delete from public.library_resources where id = $1", [
+      resourceId,
+    ]);
+    await expect(
+      db.query(
+        "select count(*)::int as count from public.client_resources where client_id = $1",
+        [clientId]
+      )
+    ).resolves.toMatchObject({ rows: [{ count: 0 }] });
   });
 });

@@ -4,6 +4,7 @@ import {
   checkoutSessionIdSchema,
   clientActionSchema,
   leadSubmissionSchema,
+  libraryResourceInputSchema,
   onboardingSchema,
   passwordSchema,
   TERMS_VERSION,
@@ -137,5 +138,60 @@ describe("shared request contracts", () => {
         workouts: [{ ...program.workouts[0], durationMinutes: 601 }],
       }).success
     ).toBe(false);
+  });
+
+  it("accepts only safe URL-based library resources and complete actions", () => {
+    const resource = {
+      title: "Protein meal guide",
+      kind: "nutrition" as const,
+      url: "https://resources.example.org/protein-guide",
+    };
+    expect(libraryResourceInputSchema.parse(resource)).toEqual(resource);
+    expect(
+      libraryResourceInputSchema.parse({
+        ...resource,
+        url: "HTTPS://resources.example.org/guide",
+      }).url
+    ).toBe("https://resources.example.org/guide");
+    expect(
+      libraryResourceInputSchema.safeParse({ ...resource, url: "/guides/a" })
+        .success
+    ).toBe(true);
+    for (const url of [
+      "javascript:alert(1)",
+      "http://example.org/file",
+      "//example.org/file",
+      "https://example.org/has a space",
+    ]) {
+      expect(
+        libraryResourceInputSchema.safeParse({ ...resource, url }).success,
+        url
+      ).toBe(false);
+    }
+    expect(
+      libraryResourceInputSchema.safeParse({ ...resource, kind: "upload" })
+        .success
+    ).toBe(false);
+    for (const action of [
+      { kind: "create-resource", resource },
+      {
+        kind: "update-resource",
+        resourceId: "00000000-0000-4000-8000-000000000021",
+        expectedUpdatedAt: "2026-07-12T20:00:00.000Z",
+        resource,
+      },
+      {
+        kind: "delete-resource",
+        resourceId: "00000000-0000-4000-8000-000000000021",
+      },
+      {
+        kind: "set-resource-assignment",
+        resourceId: "00000000-0000-4000-8000-000000000021",
+        clientId: "00000000-0000-4000-8000-000000000022",
+        assigned: true,
+      },
+    ]) {
+      expect(adminActionSchema.safeParse(action).success).toBe(true);
+    }
   });
 });

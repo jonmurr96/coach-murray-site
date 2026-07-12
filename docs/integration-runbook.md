@@ -50,7 +50,9 @@
 4. Create a webhook endpoint at `https://YOUR_DOMAIN/.netlify/functions/stripe-webhook`.
 5. Subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.updated`, `customer.subscription.deleted`, and `invoice.payment_failed`.
 6. Store the live secret key and webhook signing secret only in Netlify environment variables.
-7. Test an approved paid session, an incomplete session, and a completed session from a non-coaching Payment Link; only the approved paid session may reveal onboarding.
+7. Create one active live Billing Portal configuration with invoice history, payment-method updates, and cancellation at period end. Store its `bpc_...` ID as `STRIPE_BILLING_PORTAL_CONFIGURATION_ID`; the client Function always names this exact configuration instead of relying on Stripe's default.
+8. Test an approved paid session, an incomplete session, and a completed session from a non-coaching Payment Link; only the approved paid session may reveal onboarding.
+9. From an authenticated linked client, open **Manage billing securely**, confirm Stripe hosts the session, and confirm **Return to Coach Murray** resolves to `/dashboard`.
 
 ## 3. Email
 
@@ -80,8 +82,9 @@ Exercise these checks on a deploy preview with test-mode Stripe and a non-produc
 6. Password recovery shows the same request response for known and unknown email addresses. An expired/reused token fails closed; a valid token changes the password and revokes other refresh sessions.
 7. `/coach/sign-in` opens Coach OS only for `owner`, `coach`, or `admin` in signed `app_metadata`. A client token and a role placed only in `user_metadata` receive no coach access.
 8. Coach OS can review the paid intake and, after the cooldown, resend account setup to a still-pending client. Concurrent resend attempts deliver at most one email.
-9. Dashboard, Coach OS, setup, recovery, and confirmation pages return `private, no-store`, `noindex`, `no-referrer`, and the route-specific self-only script CSP.
-10. Run `pnpm verify` and `pnpm test:e2e`, then inspect Netlify function logs, Supabase Auth audit logs, Stripe webhook delivery, and Resend delivery without recording secrets or health-form payloads.
+9. Coach OS can create, edit, delete, and assign a validated HTTPS or same-site Library resource. Only assigned clients see it; removing the assignment revokes it on the next dashboard refresh.
+10. Dashboard, Coach OS, setup, recovery, and confirmation pages return `private, no-store`, `noindex`, `no-referrer`, and the route-specific self-only script CSP.
+11. Run `pnpm verify` and `pnpm test:e2e`, then inspect Netlify function logs, Supabase Auth audit logs, Stripe webhook delivery, and Resend delivery without recording secrets or health-form payloads.
 
 The ignored local `.env` can also drive the read-only release guard:
 
@@ -90,7 +93,7 @@ pnpm release:check:candidate
 pnpm release:check
 ```
 
-The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, Stripe allowlist and deployed pricing-link mapping, disabled webhook safety, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function boundaries. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
+The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, Stripe allowlist and deployed pricing-link mapping, the live Billing Portal configuration, disabled webhook safety, the canonical application schema, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function/private-route boundaries. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
 
 ## 6. Future integrations
 

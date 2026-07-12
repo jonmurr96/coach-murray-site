@@ -100,7 +100,7 @@ export default async function handler(request: Request, _context: Context) {
         id: string;
         title: string;
         kind: string;
-        url?: string;
+        url: string;
       } | null;
       return resource ? [resource] : [];
     });

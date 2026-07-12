@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Coach Murray - Online Fitness Coaching</title>
-<meta name="description" content="One-to-one online fitness coaching with custom training, practical nutrition, weekly check-ins, and direct coach support."/>
+<meta name="description" content="One-to-one online fitness coaching with custom training, practical nutrition, scheduled check-ins, and direct coach support."/>
 <link rel="icon" href="data:,"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
@@ -64,13 +64,13 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .nav-cta{min-height:44px;padding:11px 24px;border-radius:8px;cursor:pointer;background:var(--gold);font-family:var(--font);font-size:11px;font-weight:700;color:var(--bg);letter-spacing:1.5px;text-transform:uppercase;transition:all .3s var(--ease);border:none}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(212,170,64,0.3);background:var(--goldL)}
 .nav-mobile-actions{display:none;align-items:center;gap:6px;flex:0 0 auto}
-.nav-mobile-signin,.nav-mobile-cta{min-height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;text-decoration:none;white-space:nowrap}
-.nav-mobile-signin{padding:9px 12px;border:1px solid var(--goldB);background:rgba(5,5,7,.82);color:var(--gold)}
+.nav-mobile-signin,.nav-mobile-cta{min-height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.nav-mobile-signin{padding:9px 10px;border:1px solid var(--goldB);background:rgba(5,5,7,.82);color:var(--gold)}
+.nav-mobile-signin.coach{border-color:var(--gb);color:var(--tm)}
 .nav-mobile-cta{padding:9px 14px;border:1px solid var(--gold);background:var(--gold);color:var(--bg)}
-.mobile-signin-short{display:none}
 @media(max-width:1040px){.nav-links{display:none}.nav-mobile-actions{display:flex}#nav{padding:14px 16px}}
-@media(max-width:390px){.mobile-signin-full{display:none}.mobile-signin-short{display:inline}.nav-inner{gap:8px}.nav-logo{gap:10px}.nav-mobile-signin{padding-left:10px;padding-right:10px}.nav-mobile-cta{padding-left:12px;padding-right:12px}}
-@media(max-width:340px){.nav-mark{width:34px;height:34px}.nav-brand{font-size:11px}.nav-sub{display:none}}
+@media(max-width:430px){.nav-inner{gap:8px}.nav-logo{gap:9px}.nav-mobile-actions{gap:4px}.nav-mobile-signin{padding-left:8px;padding-right:8px}.nav-mobile-cta{padding-left:10px;padding-right:10px}}
+@media(max-width:370px){#nav{padding-left:10px;padding-right:10px}.nav-mark{width:34px;height:34px}.nav-brand{font-size:11px}.nav-sub{display:none}}
 .hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:center;padding:140px 32px 60px}
 .orb{position:absolute;border-radius:50%;filter:blur(var(--blur));pointer-events:none;animation:orbFloat 12s ease-in-out infinite alternate}
 .hero-line-v{position:absolute;top:20%;right:8%;width:1px;height:120px;background:linear-gradient(to bottom,var(--goldB),transparent);opacity:.5}
@@ -657,7 +657,8 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
       </div>
     </div>
     <div class="nav-mobile-actions" role="group" aria-label="Account and application links">
-      <a class="nav-mobile-signin" href="/sign-in" aria-label="Client Sign In"><span class="mobile-signin-full">Client Sign In</span><span class="mobile-signin-short" aria-hidden="true">Sign In</span></a>
+      <a class="nav-mobile-signin" href="/sign-in" aria-label="Client Sign In">Client</a>
+      <a class="nav-mobile-signin coach" href="/coach/sign-in" aria-label="Coach OS Sign In">Coach</a>
       <button class="nav-mobile-cta" onclick="cmScroll('apply')">Apply</button>
     </div>
   </div>
@@ -675,7 +676,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
       <div class="live-pill"><span class="live-dot"></span>1:1 online coaching · Huntsville, AL</div>
       <div class="hero-eyebrow"><div class="hero-eyebrow-line"></div><span class="hero-eyebrow-text">Online Coaching</span></div>
       <h1><span class="h1-plain">Build the</span><span class="h1-shimmer aberrant">body you deserve.</span></h1>
-      <p class="hero-sub">Science-backed programming. Personalized nutrition. Weekly accountability. Every plan built from scratch — for <em>you</em>.</p>
+      <p class="hero-sub">Science-backed programming. Personalized nutrition. Consistent accountability. Every plan built from scratch — for <em>you</em>.</p>
       <div class="hero-btns">
         <button class="btn-primary" onclick="window.location.href='/quiz.html'" data-magnetic data-magnetic-radius="80" data-magnetic-travel="10">Find Your Plan — Free Quiz <span style="font-size:16px">→</span></button>
         <button class="btn-secondary" onclick="cmScroll('packages')" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6">View Packages</button>
@@ -683,7 +684,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
       <a class="client-login-link" href="/sign-in">Already a client? Sign in to your dashboard →</a>
       <div class="hero-stats">
         <div class="hero-stat"><div class="stat-num">Custom</div><div class="stat-lbl">Every program</div><span class="stat-tick"></span></div>
-        <div class="hero-stat"><div class="stat-num">Weekly</div><div class="stat-lbl">Check-ins</div><span class="stat-tick"></span></div>
+        <div class="hero-stat"><div class="stat-num">Scheduled</div><div class="stat-lbl">Check-ins</div><span class="stat-tick"></span></div>
         <div class="hero-stat"><div class="stat-num">Direct</div><div class="stat-lbl">Coach access</div><span class="stat-tick"></span></div>
         <div class="hero-stat"><div class="stat-num">1:1</div><div class="stat-lbl">Built for you</div><span class="stat-tick"></span></div>
       </div>
@@ -738,7 +739,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
           <p class="about-body">I placed 2nd in my first bodybuilding show and bring that same discipline to every client. Whether you're prepping for stage or just want to feel confident, I meet you where you are.</p>
           <div class="feat-list">
             <div class="feat"><div class="feat-dot"></div>Programs built around YOUR schedule &amp; equipment</div>
-            <div class="feat"><div class="feat-dot"></div>Weekly check-ins with detailed coaching feedback</div>
+            <div class="feat"><div class="feat-dot"></div>Scheduled check-ins with detailed coaching feedback</div>
             <div class="feat"><div class="feat-dot"></div>Direct access — no chatbots, no assistants</div>
             <div class="feat"><div class="feat-dot"></div>Adjustments based on real data, not templates</div>
           </div>
@@ -773,7 +774,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
           <span class="corner-notch tl"></span><span class="corner-notch br"></span>
           <span class="bento-num">03</span>
           <svg class="bento-card-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="32" height="30" rx="3"/><path d="M8 18h32"/><path d="M16 6v8M32 6v8"/><path d="M16 28l3 3 7-7"/></svg>
-          <div class="bento-title">Weekly Check-ins</div>
+          <div class="bento-title">Scheduled Check-ins</div>
           <div class="bento-desc">Submit progress. Plan adjusts.</div>
         </div>
         <div class="bento-card reveal" data-spotlight>
@@ -812,7 +813,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
         <span class="corner-notch tl"></span><span class="corner-notch br"></span>
         <div class="proof-num">03</div>
         <span class="proof-needle"></span>
-        <div class="proof-lbl">Weekly check-ins that turn your feedback into plan adjustments</div>
+        <div class="proof-lbl">Scheduled check-ins that turn your feedback into plan adjustments</div>
       </div>
       <div class="proof-stat reveal" data-spotlight>
         <span class="corner-notch tl"></span><span class="corner-notch br"></span>
@@ -910,7 +911,7 @@ footer{padding:56px 32px;border-top:1px solid var(--gb)}
       <div class="label-row reveal" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">FAQ</span><div class="label-line" style="width:32px"></div></div>
       <h2 class="section-h2 reveal">Common <span style="color:var(--gold)">questions.</span></h2>
       <div class="faq-list" id="faqList">
-        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.01</span>What does online coaching actually look like?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">You'll receive a fully customized training program and nutrition plan through your client portal. Each week you submit a check-in with your weight, progress photos, and biofeedback scores. I review everything, adjust your plan, and send detailed coaching feedback within 24-48 hours. Plus direct messaging access between check-ins.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.01</span>What does online coaching actually look like?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">You'll receive a fully customized training program and nutrition plan through your client portal. At the cadence included in your package, submit your optional weight, energy, adherence, wins, and challenges. I review the signal, adjust your plan as needed, and reply inside the portal. You also have direct messaging access between check-ins.</p></div></div>
         <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.02</span>I'm a complete beginner — is this for me?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Absolutely. I work with everyone from first-time gym-goers to competitive bodybuilders. Your program is built for your experience level, equipment access, and schedule. You won't be thrown into anything that doesn't fit.</p></div></div>
         <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.03</span>How is this different from a free YouTube program?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">A YouTube program doesn't know your injury history, work schedule, stress levels, or how your body responds. I build and adjust based on real data from your check-ins. That feedback loop produces results — not the exercises themselves.</p></div></div>
         <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.04</span>What if I travel or miss a week?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Life happens. I'll program travel-friendly alternatives and adjust around vacations, work trips, or anything else. Consistency over perfection.</p></div></div>

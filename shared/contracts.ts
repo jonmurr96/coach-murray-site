@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const TERMS_VERSION = "2026-07-10" as const;
+export const TERMS_VERSION = "2026-07-12" as const;
 
 const optionalText = z.string().trim().max(2_000).optional().default("");
 const optionalShortText = z.string().trim().max(240).optional().default("");
@@ -163,6 +163,36 @@ export const nutritionAssignmentSchema = z.object({
   notes: z.string().trim().max(5_000).optional().default(""),
 });
 
+export const libraryResourceKindSchema = z.enum([
+  "guide",
+  "training",
+  "nutrition",
+  "video",
+  "worksheet",
+]);
+
+export const libraryResourceUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "A resource URL is required")
+  .max(2_048, "The resource URL is too long")
+  .refine(value => {
+    if (/\s/.test(value)) return false;
+    if (/^\/[^/\s][^\s]*$/.test(value)) return true;
+    try {
+      return new URL(value).protocol === "https:";
+    } catch {
+      return false;
+    }
+  }, "Use an HTTPS URL or a same-site path beginning with one slash")
+  .transform(value => value.replace(/^https:/i, "https:"));
+
+export const libraryResourceInputSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  kind: libraryResourceKindSchema,
+  url: libraryResourceUrlSchema,
+});
+
 export const adminActionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("send-message"),
@@ -190,6 +220,26 @@ export const adminActionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("resend-client-invite"),
     clientId: z.string().uuid(),
+  }),
+  z.object({
+    kind: z.literal("create-resource"),
+    resource: libraryResourceInputSchema,
+  }),
+  z.object({
+    kind: z.literal("update-resource"),
+    resourceId: z.string().uuid(),
+    expectedUpdatedAt: z.string().datetime({ offset: true }),
+    resource: libraryResourceInputSchema,
+  }),
+  z.object({
+    kind: z.literal("delete-resource"),
+    resourceId: z.string().uuid(),
+  }),
+  z.object({
+    kind: z.literal("set-resource-assignment"),
+    resourceId: z.string().uuid(),
+    clientId: z.string().uuid(),
+    assigned: z.boolean(),
   }),
   z.object({
     kind: z.literal("mark-inbox-read"),
@@ -265,7 +315,7 @@ export type PortalPayload = {
     read: boolean;
   }>;
   progress: Array<{ recordedAt: string; weight?: number; adherence?: number }>;
-  library: Array<{ id: string; title: string; kind: string; url?: string }>;
+  library: Array<{ id: string; title: string; kind: string; url: string }>;
   subscription: null | {
     status: string;
     packageName: string;
@@ -337,6 +387,22 @@ export type AdminPayload = {
     currency: string;
     status: string;
     createdAt: string;
+  }>;
+};
+
+export type AdminLibraryPayload = {
+  resources: Array<{
+    id: string;
+    title: string;
+    kind: z.infer<typeof libraryResourceKindSchema>;
+    url: string;
+    updatedAt: string;
+    assignedClientIds: string[];
+  }>;
+  clients: Array<{
+    id: string;
+    name: string;
+    status: string;
   }>;
 };
 

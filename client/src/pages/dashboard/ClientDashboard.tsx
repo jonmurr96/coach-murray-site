@@ -35,7 +35,7 @@ import type { PortalPayload } from "@shared/contracts";
 import { AccessGate } from "@/components/AccessGate";
 import { BrandLockup } from "@/components/Brand";
 import { api, ApiError } from "@/lib/api";
-import { signOut } from "@/lib/auth";
+import { revokeOtherSessions, signOut } from "@/lib/auth";
 import { isLocalPreview } from "@/lib/config";
 
 type TabId =
@@ -64,7 +64,7 @@ const primaryNav: NavItem[] = [
 const accountNav: NavItem[] = [
   { id: "profile", label: "Profile", icon: UserRound },
   { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "settings", label: "Account & security", icon: Settings },
 ];
 
 const previewData: PortalPayload = {
@@ -154,8 +154,18 @@ const previewData: PortalPayload = {
       kind: "Guide",
       url: "/5-day-cutting-blueprint.pdf",
     },
-    { id: "l2", title: "Protein Portions Without a Scale", kind: "Nutrition" },
-    { id: "l3", title: "How to Film a Form Check", kind: "Training" },
+    {
+      id: "l2",
+      title: "Protein Portions Without a Scale",
+      kind: "Nutrition",
+      url: "https://resources.example.org/protein-portions",
+    },
+    {
+      id: "l3",
+      title: "How to Film a Form Check",
+      kind: "Training",
+      url: "https://resources.example.org/form-check",
+    },
   ],
   subscription: {
     status: "active",
@@ -600,7 +610,7 @@ function CheckIns({
   return (
     <>
       <PageHeader
-        kicker="Weekly review"
+        kicker="Progress review"
         title="Check-in"
         description="Share the signal your coach needs to adjust the plan—not just the numbers."
       />
@@ -651,7 +661,7 @@ function CheckIns({
               maxLength={2000}
               value={wins}
               onChange={e => setWins(e.target.value)}
-              placeholder="What went well this week?"
+              placeholder="What has gone well since your last check-in?"
             />
           </label>
           <label className="mt-5 block text-sm font-bold">
@@ -735,7 +745,7 @@ function Progress({ data }: { data: PortalPayload }) {
         </Panel>
         <Panel className="overflow-hidden">
           <div className="border-b border-[var(--cm-border)] p-5">
-            <h2 className="font-bold">Weekly trend</h2>
+            <h2 className="font-bold">Progress trend</h2>
           </div>
           {data.progress.length ? (
             <div className="divide-y divide-[var(--cm-border)]">
@@ -935,6 +945,7 @@ function AccountPage({
   tab: "profile" | "billing" | "settings";
   data: PortalPayload;
 }) {
+  const [revoking, setRevoking] = useState(false);
   const billing = async () => {
     if (data.preview) {
       toast.info("Preview only — no billing portal was opened.");
@@ -949,6 +960,27 @@ function AccountPage({
           ? error.message
           : "Billing portal is unavailable."
       );
+    }
+  };
+  const revokeSessions = async () => {
+    if (data.preview) {
+      toast.info("Preview only — no sessions were changed.");
+      return;
+    }
+    setRevoking(true);
+    try {
+      await revokeOtherSessions();
+      toast.success(
+        "Other-device refresh tokens were revoked. Existing access ends when current tokens expire."
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Other sessions could not be signed out."
+      );
+    } finally {
+      setRevoking(false);
     }
   };
   if (tab === "profile")
@@ -1017,20 +1049,32 @@ function AccountPage({
     <>
       <PageHeader
         kicker="Account"
-        title="Settings"
+        title="Account & security"
         description="Security and session controls."
       />
       <Panel className="max-w-2xl p-6">
-        <h2 className="font-bold">Sign out everywhere you use this browser</h2>
+        <h2 className="font-bold">Session controls</h2>
         <p className="mt-2 text-sm text-[var(--cm-text-muted)]">
-          You can return with a secure email link at any time.
+          Sign out here, or revoke refresh access on your other devices while
+          keeping this one active. An already-issued access token can continue
+          until its short expiry.
         </p>
-        <button
-          onClick={() => void signOut()}
-          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--cm-border)] px-4 text-sm font-bold text-[var(--cm-text-soft)]"
-        >
-          <LogOut size={16} /> Sign out
-        </button>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            onClick={() => void signOut()}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--cm-border)] px-4 text-sm font-bold text-[var(--cm-text-soft)]"
+          >
+            <LogOut size={16} /> Sign out on this device
+          </button>
+          <button
+            onClick={() => void revokeSessions()}
+            disabled={revoking}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--cm-border)] px-4 text-sm font-bold text-[var(--cm-text-soft)] disabled:opacity-60"
+          >
+            <Settings size={16} />
+            {revoking ? "Revoking…" : "Revoke other device sessions"}
+          </button>
+        </div>
       </Panel>
     </>
   );

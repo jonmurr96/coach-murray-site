@@ -230,6 +230,16 @@ export function siteUrl() {
   return parsed.origin;
 }
 
+export function billingPortalConfigurationId() {
+  const value = requiredEnv("STRIPE_BILLING_PORTAL_CONFIGURATION_ID");
+  if (!/^bpc_[A-Za-z0-9]+$/.test(value))
+    throw new HttpError(
+      503,
+      "STRIPE_BILLING_PORTAL_CONFIGURATION_ID is not valid."
+    );
+  return value;
+}
+
 export function centsToUnits(value: number | null | undefined) {
   return typeof value === "number" ? value / 100 : 0;
 }

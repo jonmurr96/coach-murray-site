@@ -10,18 +10,17 @@ import {
 import {
   BarChart3,
   BellRing,
-  BookOpen,
-  Bot,
-  CalendarDays,
   CheckCircle2,
   ClipboardCheck,
   CreditCard,
+  ExternalLink,
   FileText,
   LayoutDashboard,
   Library,
   LogOut,
   Menu,
   MessageCircle,
+  Pencil,
   Plus,
   Search,
   Send,
@@ -34,7 +33,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { AdminClientDetailPayload, AdminPayload } from "@shared/contracts";
+import type {
+  AdminClientDetailPayload,
+  AdminLibraryPayload,
+  AdminPayload,
+} from "@shared/contracts";
 import { AccessGate } from "@/components/AccessGate";
 import { BrandLockup } from "@/components/Brand";
 import { api, ApiError } from "@/lib/api";
@@ -45,13 +48,11 @@ type TabId =
   | "overview"
   | "clients"
   | "checkins"
-  | "calendar"
   | "programs"
   | "messages"
   | "leads"
   | "payments"
   | "library"
-  | "automations"
   | "analytics"
   | "settings";
 type NavItem = { id: TabId; label: string; icon: LucideIcon };
@@ -63,7 +64,6 @@ const navGroups: Array<{ label: string; items: NavItem[] }> = [
       { id: "overview", label: "Overview", icon: LayoutDashboard },
       { id: "clients", label: "Clients", icon: Users },
       { id: "checkins", label: "Check-ins", icon: ClipboardCheck },
-      { id: "calendar", label: "Calendar", icon: CalendarDays },
       { id: "programs", label: "Programs", icon: FileText },
       { id: "messages", label: "Messages", icon: MessageCircle },
     ],
@@ -80,11 +80,51 @@ const navGroups: Array<{ label: string; items: NavItem[] }> = [
     label: "System",
     items: [
       { id: "library", label: "Library", icon: Library },
-      { id: "automations", label: "Automations", icon: Bot },
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "settings", label: "Account & Security", icon: Settings },
     ],
   },
 ];
+
+const previewLibrary: AdminLibraryPayload = {
+  resources: [
+    {
+      id: "00000000-0000-4000-8000-000000000041",
+      title: "5-Day Cutting Blueprint",
+      kind: "guide",
+      url: "/5-day-cutting-blueprint.pdf",
+      updatedAt: "2026-07-10T15:00:00.000Z",
+      assignedClientIds: ["00000000-0000-0000-0000-000000000011"],
+    },
+    {
+      id: "00000000-0000-4000-8000-000000000042",
+      title: "How to Film a Form Check",
+      kind: "video",
+      url: "https://example.com/form-check",
+      updatedAt: "2026-07-10T16:00:00.000Z",
+      assignedClientIds: [
+        "00000000-0000-0000-0000-000000000011",
+        "00000000-0000-0000-0000-000000000012",
+      ],
+    },
+  ],
+  clients: [
+    {
+      id: "00000000-0000-0000-0000-000000000011",
+      name: "Preview Client A",
+      status: "active",
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000012",
+      name: "Preview Client B",
+      status: "check-in due",
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000013",
+      name: "Preview Client C",
+      status: "plan pending",
+    },
+  ],
+};
 
 const previewData: AdminPayload = {
   preview: true,
@@ -1983,71 +2023,553 @@ function AnalyticsPage({ data }: { data: AdminPayload }) {
   );
 }
 
-function SystemPage({
-  tab,
-  data,
-}: {
-  tab: "calendar" | "library" | "automations" | "settings";
-  data: AdminPayload;
-}) {
-  const map = {
-    calendar: {
-      icon: CalendarDays,
-      kicker: "Schedule",
-      title: "Calendar",
-      description: "Kickoff calls and check-in deadlines belong here.",
-      empty:
-        "Connect the approved calendar provider before scheduling from Coach OS.",
-    },
-    library: {
-      icon: BookOpen,
-      kicker: "Resources",
-      title: "Library",
-      description: "Reusable training and nutrition resources.",
-      empty:
-        "Create resources only after storage and access policies are configured.",
-    },
-    automations: {
-      icon: Bot,
-      kicker: "Workflow",
-      title: "Automations",
-      description: "Event-driven follow-ups with visible status and ownership.",
-      empty:
-        "Automations remain off until email, webhook retries, and consent rules are configured.",
-    },
-    settings: {
-      icon: Settings,
-      kicker: "System",
-      title: "Settings",
-      description: "Security, integrations, and account controls.",
-      empty:
-        "Production secrets are managed in Netlify environment variables and are never displayed here.",
-    },
-  } as const;
-  const item = map[tab];
+type LibraryResource = AdminLibraryPayload["resources"][number];
+type LibraryResourceKind = LibraryResource["kind"];
+
+const resourceKinds: Array<{
+  value: LibraryResourceKind;
+  label: string;
+}> = [
+  { value: "guide", label: "Guide" },
+  { value: "training", label: "Training" },
+  { value: "nutrition", label: "Nutrition" },
+  { value: "video", label: "Video" },
+  { value: "worksheet", label: "Worksheet" },
+];
+
+function resourceLocation(url: string) {
+  if (url.startsWith("/")) return "Coach Murray website";
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "External resource";
+  }
+}
+
+export function LibraryPage({ preview }: { preview: boolean }) {
+  const [library, setLibrary] = useState<AdminLibraryPayload | null>(
+    preview ? previewLibrary : null
+  );
+  const [loadError, setLoadError] = useState("");
+  const [selectedId, setSelectedId] = useState(
+    previewLibrary.resources[0]?.id ?? ""
+  );
+  const [editingId, setEditingId] = useState("");
+  const [expectedUpdatedAt, setExpectedUpdatedAt] = useState("");
+  const [title, setTitle] = useState("");
+  const [kind, setKind] = useState<LibraryResourceKind>("guide");
+  const [url, setUrl] = useState("");
+  const [search, setSearch] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
+  const [assignmentBusy, setAssignmentBusy] = useState("");
+
+  const loadLibrary = useCallback(async () => {
+    if (preview) return previewLibrary;
+    const next = await api.getAdminLibrary();
+    setLibrary(next);
+    setLoadError("");
+    setSelectedId(current =>
+      current && next.resources.some(resource => resource.id === current)
+        ? current
+        : (next.resources[0]?.id ?? "")
+    );
+    return next;
+  }, [preview]);
+
+  useEffect(() => {
+    if (preview) return;
+    void loadLibrary().catch(error =>
+      setLoadError(
+        error instanceof Error
+          ? error.message
+          : "The resource library could not be loaded."
+      )
+    );
+  }, [loadLibrary, preview]);
+
+  const resetEditor = () => {
+    setEditingId("");
+    setExpectedUpdatedAt("");
+    setTitle("");
+    setKind("guide");
+    setUrl("");
+  };
+  const editResource = (resource: LibraryResource) => {
+    setSelectedId(resource.id);
+    setEditingId(resource.id);
+    setExpectedUpdatedAt(resource.updatedAt);
+    setTitle(resource.title);
+    setKind(resource.kind);
+    setUrl(resource.url);
+  };
+  const submitResource = async (event: FormEvent) => {
+    event.preventDefault();
+    if (preview) {
+      toast.info("Preview only — no library resource was saved.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const result = editingId
+        ? await api.adminAction({
+            kind: "update-resource",
+            resourceId: editingId,
+            expectedUpdatedAt,
+            resource: { title, kind, url },
+          })
+        : await api.adminAction({
+            kind: "create-resource",
+            resource: { title, kind, url },
+          });
+      const next = await loadLibrary();
+      setSelectedId(result.resourceId ?? next.resources[0]?.id ?? "");
+      resetEditor();
+      toast.success(editingId ? "Resource updated." : "Resource created.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "The resource could not be saved."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+  const deleteResource = async (resource: LibraryResource) => {
+    if (preview) {
+      toast.info("Preview only — no library resource was deleted.");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Delete “${resource.title}”? It will be removed from every assigned client.`
+      )
+    )
+      return;
+    setDeletingId(resource.id);
+    try {
+      await api.adminAction({
+        kind: "delete-resource",
+        resourceId: resource.id,
+      });
+      if (editingId === resource.id) resetEditor();
+      await loadLibrary();
+      toast.success("Resource deleted and client assignments removed.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "The resource could not be deleted."
+      );
+    } finally {
+      setDeletingId("");
+    }
+  };
+  const setAssignment = async (clientId: string, assigned: boolean) => {
+    if (!selectedId || preview) return;
+    const busyKey = `${selectedId}:${clientId}`;
+    setAssignmentBusy(busyKey);
+    try {
+      await api.adminAction({
+        kind: "set-resource-assignment",
+        resourceId: selectedId,
+        clientId,
+        assigned,
+      });
+      setLibrary(current =>
+        current
+          ? {
+              ...current,
+              resources: current.resources.map(resource =>
+                resource.id === selectedId
+                  ? {
+                      ...resource,
+                      assignedClientIds: assigned
+                        ? Array.from(
+                            new Set([...resource.assignedClientIds, clientId])
+                          )
+                        : resource.assignedClientIds.filter(
+                            assignedId => assignedId !== clientId
+                          ),
+                    }
+                  : resource
+              ),
+            }
+          : current
+      );
+      toast.success(assigned ? "Resource assigned." : "Assignment removed.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "The assignment could not be updated."
+      );
+    } finally {
+      setAssignmentBusy("");
+    }
+  };
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredResources = (library?.resources ?? []).filter(resource =>
+    `${resource.title} ${resource.kind} ${resource.url}`
+      .toLowerCase()
+      .includes(normalizedSearch)
+  );
+  const normalizedClientSearch = clientSearch.trim().toLowerCase();
+  const filteredClients = (library?.clients ?? []).filter(client =>
+    `${client.name} ${client.status}`
+      .toLowerCase()
+      .includes(normalizedClientSearch)
+  );
+  const selected = library?.resources.find(
+    resource => resource.id === selectedId
+  );
+
   return (
     <>
       <Header
-        kicker={item.kicker}
-        title={item.title}
-        description={item.description}
+        kicker="Resources"
+        title="Library"
+        description="Create trusted resource links and choose exactly which clients can access each one."
+        action={
+          <button
+            className="cm-button-primary inline-flex min-h-11 items-center gap-2 px-4 py-2.5 text-sm"
+            onClick={resetEditor}
+          >
+            <Plus size={16} /> New resource
+          </button>
+        }
       />
-      <Panel className="max-w-3xl">
-        <Empty
-          icon={item.icon}
-          title={data.preview ? "Preview state" : "Configuration required"}
-          description={item.empty}
-        />
-        {tab === "settings" && (
-          <div className="border-t border-[var(--cm-border)] p-5">
+      {loadError ? (
+        <Panel className="max-w-2xl p-6">
+          <div role="alert">
+            <h2 className="font-extrabold text-[var(--cm-danger)]">
+              Library unavailable
+            </h2>
+            <p className="mt-2 text-sm text-[var(--cm-text-soft)]">
+              {loadError}
+            </p>
             <button
-              onClick={() => void signOut()}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--cm-border)] px-4 text-sm font-bold text-[var(--cm-text-soft)]"
+              className="mt-4 min-h-11 rounded-xl border border-[var(--cm-border-strong)] px-4 text-sm font-bold"
+              onClick={() => void loadLibrary().catch(() => undefined)}
+            >
+              Try again
+            </button>
+          </div>
+        </Panel>
+      ) : !library ? (
+        <Panel>
+          <div
+            role="status"
+            className="p-8 text-sm text-[var(--cm-text-muted)]"
+          >
+            Loading resource library…
+          </div>
+        </Panel>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+          <div className="space-y-4">
+            <Panel className="overflow-hidden">
+              <div className="border-b border-[var(--cm-border)] p-5">
+                <label
+                  className="block text-sm font-bold"
+                  htmlFor="resource-search"
+                >
+                  Search resources
+                </label>
+                <div className="relative mt-2">
+                  <Search
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--cm-text-muted)]"
+                    size={17}
+                  />
+                  <input
+                    id="resource-search"
+                    className="cm-input pl-10 pr-3"
+                    value={search}
+                    onChange={event => setSearch(event.target.value)}
+                    placeholder="Title, kind, or URL"
+                  />
+                </div>
+              </div>
+              {filteredResources.length ? (
+                <div className="divide-y divide-[var(--cm-border)]">
+                  {filteredResources.map(resource => (
+                    <article
+                      key={resource.id}
+                      className={`p-5 ${selectedId === resource.id ? "bg-[rgb(212_170_64_/_0.06)]" : ""}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <button
+                          type="button"
+                          className="min-w-0 flex-1 text-left"
+                          onClick={() => setSelectedId(resource.id)}
+                          aria-pressed={selectedId === resource.id}
+                        >
+                          <span className="block truncate font-extrabold">
+                            {resource.title}
+                          </span>
+                          <span className="mt-1 block text-xs capitalize text-[var(--cm-text-muted)]">
+                            {resource.kind} · {resourceLocation(resource.url)}
+                          </span>
+                          <span className="mt-3 inline-flex rounded-full border border-[var(--cm-border)] px-2.5 py-1 text-xs font-bold text-[var(--cm-text-soft)]">
+                            {resource.assignedClientIds.length} client
+                            {resource.assignedClientIds.length === 1 ? "" : "s"}
+                          </span>
+                        </button>
+                        <div className="flex shrink-0 gap-1">
+                          <a
+                            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--cm-border)] text-[var(--cm-text-muted)] hover:text-[var(--cm-gold)]"
+                            href={resource.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`Open ${resource.title}`}
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                          <button
+                            type="button"
+                            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--cm-border)] text-[var(--cm-text-muted)] hover:text-[var(--cm-gold)]"
+                            onClick={() => editResource(resource)}
+                            aria-label={`Edit ${resource.title}`}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--cm-border)] text-[var(--cm-text-muted)] hover:text-[var(--cm-danger)] disabled:opacity-50"
+                            disabled={deletingId === resource.id}
+                            onClick={() => void deleteResource(resource)}
+                            aria-label={`Delete ${resource.title}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <Empty
+                  icon={Library}
+                  title={
+                    library.resources.length
+                      ? "No matching resources"
+                      : "No resources yet"
+                  }
+                  description={
+                    library.resources.length
+                      ? "Try a different title, kind, or URL."
+                      : "Create the first trusted resource link for your clients."
+                  }
+                />
+              )}
+            </Panel>
+
+            <Panel className="overflow-hidden">
+              <div className="border-b border-[var(--cm-border)] p-5">
+                <h2 className="font-extrabold">Client access</h2>
+                <p className="mt-1 text-sm text-[var(--cm-text-muted)]">
+                  {selected
+                    ? `Choose who can open “${selected.title}.”`
+                    : "Select a resource to manage its client access."}
+                </p>
+              </div>
+              {selected ? (
+                <div className="p-5">
+                  <label
+                    className="block text-sm font-bold"
+                    htmlFor="library-client-search"
+                  >
+                    Find a client
+                  </label>
+                  <input
+                    id="library-client-search"
+                    className="cm-input mt-2 px-3"
+                    value={clientSearch}
+                    onChange={event => setClientSearch(event.target.value)}
+                    placeholder="Name or status"
+                  />
+                  {preview && (
+                    <p className="mt-3 text-xs text-[var(--cm-text-muted)]">
+                      Assignments are disabled in preview mode.
+                    </p>
+                  )}
+                  <fieldset className="mt-4 max-h-80 space-y-2 overflow-y-auto">
+                    <legend className="sr-only">Assigned clients</legend>
+                    {filteredClients.map(client => {
+                      const checked = selected.assignedClientIds.includes(
+                        client.id
+                      );
+                      const busy =
+                        assignmentBusy === `${selected.id}:${client.id}`;
+                      return (
+                        <label
+                          key={client.id}
+                          className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-[var(--cm-border)] px-3 py-2"
+                        >
+                          <input
+                            type="checkbox"
+                            className="h-5 w-5 accent-[var(--cm-gold)]"
+                            checked={checked}
+                            disabled={preview || Boolean(assignmentBusy)}
+                            onChange={event =>
+                              void setAssignment(
+                                client.id,
+                                event.target.checked
+                              )
+                            }
+                          />
+                          <span className="min-w-0 flex-1">
+                            <strong className="block truncate text-sm">
+                              {client.name}
+                            </strong>
+                            <span className="block text-xs capitalize text-[var(--cm-text-muted)]">
+                              {busy ? "Saving…" : client.status}
+                            </span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                    {!filteredClients.length && (
+                      <p className="py-5 text-center text-sm text-[var(--cm-text-muted)]">
+                        {library.clients.length
+                          ? "No clients match this search."
+                          : "No client records are available yet."}
+                      </p>
+                    )}
+                  </fieldset>
+                </div>
+              ) : (
+                <Empty
+                  icon={Users}
+                  title="No resource selected"
+                  description="Select or create a resource before assigning clients."
+                />
+              )}
+            </Panel>
+          </div>
+
+          <Panel className="h-fit p-5 sm:p-6">
+            <p className="cm-kicker">
+              {editingId ? "Edit resource" : "New resource"}
+            </p>
+            <h2 className="mt-2 text-xl font-extrabold">
+              {editingId ? "Update client resource" : "Add to the library"}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--cm-text-muted)]">
+              Use a secure external link or a same-site path. File uploads are
+              not enabled.
+            </p>
+            <form className="mt-6 space-y-4" onSubmit={submitResource}>
+              <label className="block text-sm font-bold">
+                Resource title
+                <input
+                  className="cm-input mt-2 px-3"
+                  required
+                  maxLength={160}
+                  value={title}
+                  onChange={event => setTitle(event.target.value)}
+                />
+              </label>
+              <label className="block text-sm font-bold">
+                Resource kind
+                <select
+                  className="cm-input mt-2 px-3 capitalize"
+                  value={kind}
+                  onChange={event =>
+                    setKind(event.target.value as LibraryResourceKind)
+                  }
+                >
+                  {resourceKinds.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-sm font-bold">
+                Resource URL
+                <input
+                  className="cm-input mt-2 px-3"
+                  required
+                  maxLength={2048}
+                  inputMode="url"
+                  value={url}
+                  onChange={event => setUrl(event.target.value)}
+                  placeholder="https://… or /resource.pdf"
+                />
+                <span className="mt-2 block text-xs font-normal leading-5 text-[var(--cm-text-muted)]">
+                  Only HTTPS destinations and paths hosted on this website are
+                  accepted.
+                </span>
+              </label>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  className="cm-button-primary min-h-11 px-5 py-2.5 text-sm"
+                  type="submit"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Saving…"
+                    : editingId
+                      ? "Save changes"
+                      : "Create resource"}
+                </button>
+                {editingId && (
+                  <button
+                    className="min-h-11 rounded-xl border border-[var(--cm-border-strong)] px-5 text-sm font-bold"
+                    type="button"
+                    onClick={resetEditor}
+                  >
+                    Cancel edit
+                  </button>
+                )}
+              </div>
+            </form>
+          </Panel>
+        </div>
+      )}
+    </>
+  );
+}
+
+function AccountSecurityPage({ preview }: { preview: boolean }) {
+  const endSession = () => {
+    if (preview) {
+      toast.info("Preview only — there is no authenticated session to end.");
+      return;
+    }
+    void signOut();
+  };
+  return (
+    <>
+      <Header
+        kicker="Your account"
+        title="Account & Security"
+        description="Manage the Coach OS session on this browser."
+      />
+      <Panel className="max-w-2xl p-5 sm:p-6">
+        <div className="flex items-start gap-4">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[rgb(212_170_64_/_0.1)] text-[var(--cm-gold)]">
+            <Settings size={20} />
+          </span>
+          <div>
+            <h2 className="font-extrabold">Current browser session</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--cm-text-muted)]">
+              Signing out ends Coach OS access on this device. Sign in again
+              with your coach account to return.
+            </p>
+            <button
+              onClick={endSession}
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--cm-border-strong)] px-4 text-sm font-bold text-[var(--cm-text-soft)]"
             >
               <LogOut size={16} /> Sign out
             </button>
           </div>
-        )}
+        </div>
       </Panel>
     </>
   );
@@ -2168,11 +2690,10 @@ function CoachOS() {
       <PaymentsPage data={data} />
     ) : active === "analytics" ? (
       <AnalyticsPage data={data} />
+    ) : active === "library" ? (
+      <LibraryPage preview={data.preview} />
     ) : (
-      <SystemPage
-        tab={active as "calendar" | "library" | "automations" | "settings"}
-        data={data}
-      />
+      <AccountSecurityPage preview={data.preview} />
     );
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[272px_1fr]">

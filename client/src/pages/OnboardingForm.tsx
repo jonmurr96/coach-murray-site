@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
+import { TERMS_VERSION } from "@shared/contracts";
 import {
   AlertCircle,
   ArrowLeft,
@@ -1036,7 +1037,7 @@ function Step6({
             "I understand that results depend on my own consistency, effort, and adherence to the program.",
             "I agree to communicate openly and honestly with my coach about my progress, struggles, and any changes in my health.",
             "I understand that my personal information will be kept confidential and used solely to build and deliver my coaching program.",
-            "I commit to completing weekly check-ins and communicating any concerns promptly.",
+            "I commit to completing check-ins at the cadence included in my plan and communicating any concerns promptly.",
             "I understand that the purchase, cancellation, and refund terms disclosed during checkout apply to my package.",
           ].map((item, i) => (
             <li key={i} className="flex gap-2">
@@ -1046,7 +1047,7 @@ function Step6({
           ))}
         </ul>
         <p className="mt-4 text-xs text-[var(--cm-text-muted)]">
-          Agreement version: 2026-07-10
+          Agreement version: {TERMS_VERSION}
         </p>
       </div>
 
@@ -1476,7 +1477,7 @@ export default function OnboardingForm() {
           termsAgreed: data.termsAgreed,
           signatureData: data.signatureData,
           typedSignature: data.typedSignature.trim(),
-          termsVersion: "2026-07-10",
+          termsVersion: TERMS_VERSION,
         });
         try {
           sessionStorage.setItem("cm-account-email", result.email);

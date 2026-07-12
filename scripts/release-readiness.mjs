@@ -15,26 +15,27 @@ const REQUIRED_WEBHOOK_EVENTS = [
   "invoice.payment_failed",
 ];
 const REQUIRED_RESEND_RECORDS = ["DKIM:TXT", "SPF:MX", "SPF:TXT"];
-const REQUIRED_TABLES = [
-  "audit_logs",
-  "client_check_ins",
-  "client_consents",
-  "client_goals",
-  "client_metrics",
+export const REQUIRED_TABLES = [
+  "check_ins",
   "client_profiles",
-  "client_programs",
-  "client_tasks",
-  "coach_notes",
+  "client_resources",
+  "intake_submissions",
   "lead_submissions",
-  "onboarding_submissions",
-  "payment_events",
-  "stripe_customers",
+  "leads",
+  "library_resources",
+  "messages",
+  "nutrition_plans",
+  "programs",
+  "progress_entries",
+  "purchases",
+  "workouts",
 ];
-const REQUIRED_PRIVATE_ROUTES = [
+export const REQUIRED_PRIVATE_ROUTES = [
   "/sign-in",
   "/coach/sign-in",
   "/account/confirm",
   "/account/reset",
+  "/account/setup",
   "/onboarding",
   "/dashboard",
   "/admin",
@@ -197,7 +198,9 @@ export async function runReadiness({
     "SUPABASE_SERVICE_ROLE_KEY",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_WEBHOOK_ENDPOINT_ID",
     "STRIPE_ALLOWED_PAYMENT_LINK_IDS",
+    "STRIPE_BILLING_PORTAL_CONFIGURATION_ID",
     "RESEND_API_KEY",
     "ONBOARDING_NOTIFY_EMAIL",
   ];
@@ -397,6 +400,39 @@ export async function runReadiness({
       paymentLinks.every(link => paymentLinkIsProductionReady(link)),
     `${paymentLinks.filter(link => paymentLinkIsProductionReady(link)).length}/4 production-ready`,
     productionOnly
+  );
+
+  let billingPortal = null;
+  if (
+    isConfigured(env.STRIPE_SECRET_KEY) &&
+    isConfigured(env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID)
+  ) {
+    try {
+      const { response, body } = await jsonRequest(
+        `https://api.stripe.com/v1/billing_portal/configurations/${encodeURIComponent(env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID)}`,
+        { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
+      );
+      if (response.ok) billingPortal = body;
+    } catch {
+      // Reported below.
+    }
+  }
+  safeCheck(
+    checks,
+    "stripe.billing_portal",
+    "Stripe Billing Portal configuration",
+    billingPortal?.active === true &&
+      billingPortal?.livemode === true &&
+      billingPortal?.default_return_url === `${PRODUCTION_ORIGIN}/dashboard` &&
+      billingPortal?.features?.invoice_history?.enabled === true &&
+      billingPortal?.features?.payment_method_update?.enabled === true &&
+      billingPortal?.features?.subscription_cancel?.enabled === true,
+    billingPortal
+      ? billingPortal.active
+        ? "active live self-service billing"
+        : "configuration is inactive"
+      : "configuration unavailable",
+    always
   );
 
   let webhook = null;

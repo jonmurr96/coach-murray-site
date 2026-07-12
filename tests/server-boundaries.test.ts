@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   approvedCheckout,
   authLookupHttpError,
+  billingPortalConfigurationId,
   checkoutLookupHttpError,
   HttpError,
   paymentLinkIdFromSession,
@@ -36,6 +37,7 @@ function checkout(
 afterEach(() => {
   delete process.env.SITE_URL;
   delete process.env.STRIPE_ALLOWED_PAYMENT_LINK_IDS;
+  delete process.env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID;
 });
 
 describe("server configuration boundaries", () => {
@@ -72,6 +74,14 @@ describe("server configuration boundaries", () => {
     expect(siteUrl()).toBe("https://coach.example");
     process.env.SITE_URL = "http://localhost:8888";
     expect(siteUrl()).toBe("http://localhost:8888");
+  });
+
+  it("requires a concrete Stripe Billing Portal configuration", () => {
+    expectHttpStatus(() => billingPortalConfigurationId(), 503);
+    process.env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID = "not-a-portal";
+    expectHttpStatus(() => billingPortalConfigurationId(), 503);
+    process.env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID = "bpc_liveportal123";
+    expect(billingPortalConfigurationId()).toBe("bpc_liveportal123");
   });
 
   it("distinguishes invalid credentials from upstream outages", () => {

@@ -6,6 +6,9 @@ export type ReleaseCheck = {
   requiredIn: string[];
 };
 
+export const REQUIRED_TABLES: string[];
+export const REQUIRED_PRIVATE_ROUTES: string[];
+
 export function parseEnv(source: string): Record<string, string>;
 export function isConfigured(value: string | undefined): boolean;
 export function senderDomain(value: string | undefined): string;

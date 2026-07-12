@@ -152,6 +152,11 @@ describe("public authentication entry points", () => {
       landingDocument.querySelector('.nav-mobile-actions a[href="/sign-in"]')
     ).not.toBeNull();
     expect(
+      landingDocument.querySelector(
+        '.nav-mobile-actions a[href="/coach/sign-in"]'
+      )
+    ).not.toBeNull();
+    expect(
       landingDocument.querySelector('.client-login-link[href="/sign-in"]')
     ).not.toBeNull();
     expect(

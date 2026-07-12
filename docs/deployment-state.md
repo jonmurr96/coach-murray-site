@@ -22,14 +22,14 @@ The existing project split is preserved deliberately:
 
 The candidate was uploaded from the release branch through Netlify's managed deploy path. Its static routes, redirects, headers, Functions, Supabase connection, Stripe connection, client role boundary, and coach role boundary have been exercised. Production `coach-murray` was not overwritten.
 
-All 11 currently usable variables from `.env.example` are configured on `coach-murray`; `TRANSACTIONAL_FROM_EMAIL` is intentionally absent because no Resend domain is verified. The same runtime contract is present on the isolated candidate. The team's current Netlify plan accepts ordinary encrypted-at-rest environment variables, while the stricter Secrets Controller context/scope combination used in the first attempt was not exposed to Functions.
+All 13 currently usable variables from `.env.example` are configured on `coach-murray`; `TRANSACTIONAL_FROM_EMAIL` is intentionally absent because no Resend domain is verified. The same runtime contract is present on the isolated candidate. The team's current Netlify plan accepts ordinary encrypted-at-rest environment variables, while the stricter Secrets Controller context/scope combination used in the first attempt was not exposed to Functions.
 
 ## Supabase
 
 - Canonical project: `Coach-Murray`
 - Project ref: `emowlnxzcemeteiuftaj`
 - State: active and healthy
-- Canonical schema plus three security/performance follow-up migrations are applied.
+- Canonical schema, three security/performance follow-up migrations, and the URL-resource Library guardrail migration are applied.
 - All public tables have RLS. Client reads are scoped to the signed user and published/assigned data; Coach OS uses role-checked Netlify Functions rather than browser-wide coach policies.
 - Hosted Auth is invite-only, anonymous sign-in is disabled, password minimum is 12 characters with lowercase/uppercase/digit requirements, refresh-token rotation is enabled, and password changes require recent authentication.
 - Production and candidate confirmation URLs are allowlisted. `supabase config push` reports remote Auth, API, and DB configuration up to date.
@@ -39,6 +39,7 @@ All 11 currently usable variables from `.env.example` are configured on `coach-m
 ## Stripe
 
 - Four live Payment Link IDs are stored in the server allowlist.
+- An active live Billing Portal configuration provides invoice history, payment-method updates, and cancellation at period end. Both Netlify projects store its exact configuration ID so client billing sessions do not depend on a mutable default.
 - A live webhook endpoint exists at `https://coach-murray.netlify.app/.netlify/functions/stripe-webhook` with exactly the required five event types.
 - The endpoint remains disabled until production promotion. Its signing secret is stored outside Git.
 - A real completed session from an allowlisted Payment Link returned `200 verified` through the candidate Function.
@@ -56,11 +57,13 @@ The branded scanner-safe templates already exist in `supabase/templates`. Do not
 
 ## Candidate verification evidence
 
-- `pnpm verify`: 73 tests plus production build passed.
-- `pnpm test:e2e`: 24 Chromium accessibility, access-boundary, and mobile-containment checks passed.
+- `pnpm verify`: 93 tests plus production build passed.
+- `pnpm test:e2e`: 25 Chromium accessibility, access-boundary, mobile-auth-entry, and containment checks passed.
 - Trusted candidate lead submission wrote one lead and one submission to Supabase; the test record was verified and deleted.
 - Untrusted origin, anonymous session, and malformed checkout probes failed closed with `403`, `401`, and `400`.
 - Ephemeral browser clients reached `/dashboard`; ephemeral owner-role coaches reached `/admin`; cross-role APIs were denied; all test users and data were removed.
+- An ephemeral owner created, edited, assigned, unassigned, and deleted a Library resource through the live candidate. The assigned client received it through both the dashboard API and browser UI.
+- An ephemeral linked client created a live Stripe Billing Portal session and received an HTTPS `billing.stripe.com` destination. The temporary Stripe customer, Supabase users/profile, and Library records were removed afterward.
 - Landing, client sign-in, coach sign-in, setup, confirmation, onboarding, dashboard, and admin routes rendered without console errors or horizontal overflow.
 
 ## OpenAI Sites

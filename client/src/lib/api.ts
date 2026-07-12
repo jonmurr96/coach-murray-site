@@ -1,6 +1,7 @@
 import type {
   AdminAction,
   AdminClientDetailPayload,
+  AdminLibraryPayload,
   AdminPayload,
   ClientAction,
   PortalPayload,
@@ -74,6 +75,9 @@ export const api = {
       `admin-client-detail?client_id=${encodeURIComponent(clientId)}`
     );
   },
+  getAdminLibrary() {
+    return request<AdminLibraryPayload>("admin-library");
+  },
   clientAction(payload: ClientAction) {
     return request<{ saved: true }>("client-action", {
       method: "POST",
@@ -81,7 +85,11 @@ export const api = {
     });
   },
   adminAction(payload: AdminAction) {
-    return request<{ saved: true; invitedAt?: string }>("admin-action", {
+    return request<{
+      saved: true;
+      invitedAt?: string;
+      resourceId?: string;
+    }>("admin-action", {
       method: "POST",
       body: JSON.stringify(payload),
     });

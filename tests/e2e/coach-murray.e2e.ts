@@ -126,6 +126,20 @@ test.describe("mobile containment", () => {
     isMobile: true,
   });
 
+  test("landing header keeps client, coach, and apply actions available", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const actions = page.locator("#nav .nav-mobile-actions");
+    await expect(
+      actions.getByRole("link", { name: "Client Sign In" })
+    ).toHaveAttribute("href", "/sign-in");
+    await expect(
+      actions.getByRole("link", { name: "Coach OS Sign In" })
+    ).toHaveAttribute("href", "/coach/sign-in");
+    await expect(actions.getByRole("button", { name: "Apply" })).toBeVisible();
+  });
+
   for (const route of [
     "/",
     "/quiz",

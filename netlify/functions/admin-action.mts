@@ -1,7 +1,7 @@
 import type { Context } from "@netlify/functions";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { adminActionSchema } from "../../shared/contracts";
+import { adminActionSchema, type AdminAction } from "../../shared/contracts";
 import {
   assertTrustedOrigin,
   errorResponse,
@@ -54,6 +54,95 @@ function inviteDeliveryError(error: {
     502,
     "The account setup invitation could not be delivered. Try again later."
   );
+}
+
+function resourceWriteError(error: { code?: string }) {
+  if (error.code === "23503")
+    return new HttpError(404, "The selected client or resource was not found.");
+  if (error.code === "23514" || error.code === "23502")
+    return new HttpError(422, "The resource details are invalid.");
+  return new HttpError(500, "The resource change could not be saved.");
+}
+
+type CreateResourceAction = Extract<AdminAction, { kind: "create-resource" }>;
+type UpdateResourceAction = Extract<AdminAction, { kind: "update-resource" }>;
+
+export async function createLibraryResource(
+  supabase: SupabaseClient,
+  resource: CreateResourceAction["resource"]
+) {
+  const { data, error } = await supabase
+    .from("library_resources")
+    .insert(resource)
+    .select("id")
+    .single();
+  if (error) throw resourceWriteError(error);
+  if (!data)
+    throw new HttpError(500, "The created resource was not confirmed.");
+  return data.id as string;
+}
+
+export async function updateLibraryResource(
+  supabase: SupabaseClient,
+  action: UpdateResourceAction
+) {
+  const { data, error } = await supabase
+    .from("library_resources")
+    .update(action.resource)
+    .eq("id", action.resourceId)
+    .eq("updated_at", action.expectedUpdatedAt)
+    .select("id")
+    .maybeSingle();
+  if (error) throw resourceWriteError(error);
+  if (!data)
+    throw new HttpError(
+      409,
+      "This resource changed after you opened it. Refresh and try again."
+    );
+  return data.id as string;
+}
+
+export async function deleteLibraryResource(
+  supabase: SupabaseClient,
+  resourceId: string
+) {
+  const { data, error } = await supabase
+    .from("library_resources")
+    .delete()
+    .eq("id", resourceId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw resourceWriteError(error);
+  if (!data) throw new HttpError(404, "The resource was not found.");
+}
+
+export async function setLibraryResourceAssignment(
+  supabase: SupabaseClient,
+  resourceId: string,
+  clientId: string,
+  assigned: boolean
+) {
+  if (assigned) {
+    const { data, error } = await supabase
+      .from("client_resources")
+      .upsert(
+        { client_id: clientId, resource_id: resourceId },
+        { onConflict: "client_id,resource_id" }
+      )
+      .select("resource_id")
+      .single();
+    if (error) throw resourceWriteError(error);
+    if (!data)
+      throw new HttpError(500, "The resource assignment was not confirmed.");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("client_resources")
+    .delete()
+    .eq("client_id", clientId)
+    .eq("resource_id", resourceId);
+  if (error) throw resourceWriteError(error);
 }
 
 export function clientInviteCooldownRemaining(
@@ -278,6 +367,26 @@ export default async function handler(request: Request, _context: Context) {
         siteUrl()
       );
       return json(200, { saved: true, ...invitation });
+    } else if (action.data.kind === "create-resource") {
+      const resourceId = await createLibraryResource(
+        supabase,
+        action.data.resource
+      );
+      return json(200, { saved: true, resourceId });
+    } else if (action.data.kind === "update-resource") {
+      const resourceId = await updateLibraryResource(supabase, action.data);
+      return json(200, { saved: true, resourceId });
+    } else if (action.data.kind === "delete-resource") {
+      await deleteLibraryResource(supabase, action.data.resourceId);
+      return json(200, { saved: true });
+    } else if (action.data.kind === "set-resource-assignment") {
+      await setLibraryResourceAssignment(
+        supabase,
+        action.data.resourceId,
+        action.data.clientId,
+        action.data.assigned
+      );
+      return json(200, { saved: true });
     } else {
       const { error } = await supabase
         .from("messages")

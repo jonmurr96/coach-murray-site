@@ -5,11 +5,32 @@ import {
   isConfigured,
   parseEnv,
   paymentLinkIsProductionReady,
+  REQUIRED_PRIVATE_ROUTES,
+  REQUIRED_TABLES,
   releaseSummary,
   senderDomain,
 } from "../scripts/release-readiness.mjs";
 
 describe("release readiness helpers", () => {
+  it("checks the canonical app schema and every private account route", () => {
+    expect(REQUIRED_TABLES).toEqual([
+      "check_ins",
+      "client_profiles",
+      "client_resources",
+      "intake_submissions",
+      "lead_submissions",
+      "leads",
+      "library_resources",
+      "messages",
+      "nutrition_plans",
+      "programs",
+      "progress_entries",
+      "purchases",
+      "workouts",
+    ]);
+    expect(REQUIRED_PRIVATE_ROUTES).toContain("/account/setup");
+  });
+
   it("parses dotenv values without treating comments as configuration", () => {
     expect(
       parseEnv('# comment\nA=one\nB="two words"\nC=three=parts\n')
