@@ -88,6 +88,7 @@ export const api = {
     return request<{
       saved: true;
       invitedAt?: string;
+      delivery?: "invite" | "recovery";
       resourceId?: string;
     }>("admin-action", {
       method: "POST",

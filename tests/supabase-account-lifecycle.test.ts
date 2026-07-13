@@ -26,6 +26,14 @@ const libraryMigrationPath = path.join(
   root,
   "supabase/migrations/20260712220000_library_resource_workflow.sql"
 );
+const explicitSetupMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712233000_explicit_account_setup_completion.sql"
+);
+const explicitPaidOnboardingMigrationPath = path.join(
+  root,
+  "supabase/migrations/20260712234500_paid_onboarding_explicit_setup.sql"
+);
 const signatureHash = "a".repeat(64);
 
 let db: PGlite;
@@ -81,6 +89,8 @@ beforeAll(async () => {
   await db.exec(readFileSync(coachRlsMigrationPath, "utf8"));
   await db.exec(readFileSync(leadRlsMigrationPath, "utf8"));
   await db.exec(readFileSync(libraryMigrationPath, "utf8"));
+  await db.exec(readFileSync(explicitSetupMigrationPath, "utf8"));
+  await db.exec(readFileSync(explicitPaidOnboardingMigrationPath, "utf8"));
 }, 15_000);
 
 afterAll(async () => {
@@ -102,7 +112,7 @@ describe("Supabase account lifecycle migration", () => {
     ).rejects.toMatchObject({ code: "23505" });
   });
 
-  it("treats a confirmed existing password account as setup-complete", async () => {
+  it("links a confirmed existing account but requires a post-link password change", async () => {
     const userId = crypto.randomUUID();
     const email = "ready@example.com";
     await db.query(
@@ -112,14 +122,25 @@ describe("Supabase account lifecycle migration", () => {
 
     const result = await completeOnboarding("cs_ready", email);
     expect(result.rows).toEqual([
-      expect.objectContaining({ portal_ready: true, intake_created: true }),
+      expect.objectContaining({ portal_ready: false, intake_created: true }),
     ]);
     await expect(
       db.query(
         "select user_id, account_setup_completed_at is not null as ready from public.client_profiles where lower(email) = lower($1)",
         [email]
       )
-    ).resolves.toMatchObject({ rows: [{ user_id: userId, ready: true }] });
+    ).resolves.toMatchObject({ rows: [{ user_id: userId, ready: false }] });
+
+    await db.query(
+      "update auth.users set encrypted_password = $2 where id = $1",
+      [userId, "client-chosen-after-link"]
+    );
+    await expect(
+      db.query(
+        "select account_setup_completed_at is not null as ready from public.client_profiles where user_id = $1",
+        [userId]
+      )
+    ).resolves.toMatchObject({ rows: [{ ready: true }] });
   });
 
   it("links an invited user at confirmation but opens the portal only after password setup", async () => {
@@ -135,8 +156,8 @@ describe("Supabase account lifecycle migration", () => {
       [userId, email]
     );
     await db.query(
-      "update auth.users set email_confirmed_at = now() where id = $1",
-      [userId]
+      "update auth.users set email_confirmed_at = now(), encrypted_password = $2 where id = $1",
+      [userId, "supabase-generated-temporary-password"]
     );
     await expect(
       db.query(
@@ -149,7 +170,7 @@ describe("Supabase account lifecycle migration", () => {
 
     await db.query(
       "update auth.users set encrypted_password = $2 where id = $1",
-      [userId, "hashed-password"]
+      [userId, "client-chosen-password"]
     );
     await expect(
       db.query(

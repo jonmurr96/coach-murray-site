@@ -34,6 +34,8 @@ function fakeSupabase(
     inviteError?: { code?: string; message: string; status?: number } | null;
     inviteThrows?: boolean;
     inviteUser?: object | null;
+    recoveryError?: { code?: string; message: string; status?: number } | null;
+    recoveryThrows?: boolean;
     updateData?: { id: string } | null;
     updateError?: object | null;
   } = {}
@@ -119,6 +121,13 @@ function fakeSupabase(
       };
     }
   );
+  const resetPasswordForEmail = vi.fn(
+    async (_email: string, _options: { redirectTo: string }) => {
+      order.push("recovery");
+      if (options.recoveryThrows) throw new Error("network unavailable");
+      return { data: {}, error: options.recoveryError ?? null };
+    }
+  );
   const client = {
     from: vi.fn((name: string) => {
       if (name === "client_profiles") return table;
@@ -126,10 +135,17 @@ function fakeSupabase(
       if (name === "purchases") return purchaseTable;
       throw new Error(`Unexpected table: ${name}`);
     }),
-    auth: { admin: { inviteUserByEmail } },
+    auth: { admin: { inviteUserByEmail }, resetPasswordForEmail },
   } as unknown as SupabaseClient;
 
-  return { client, inviteUserByEmail, table, updateBuilder, order };
+  return {
+    client,
+    inviteUserByEmail,
+    resetPasswordForEmail,
+    table,
+    updateBuilder,
+    order,
+  };
 }
 
 async function expectHttpError(
@@ -203,11 +219,15 @@ describe("coach account setup invitation resend", () => {
       now
     );
 
-    expect(result).toEqual({ invitedAt: now.toISOString() });
+    expect(result).toEqual({
+      invitedAt: now.toISOString(),
+      delivery: "invite",
+    });
     expect(fake.inviteUserByEmail).toHaveBeenCalledWith("client@example.com", {
       redirectTo: "https://coach.example/account/confirm",
     });
     expect(fake.order).toEqual(["claim", "invite"]);
+    expect(fake.resetPasswordForEmail).not.toHaveBeenCalled();
     expect(fake.updateBuilder.is).toHaveBeenCalledWith(
       "account_setup_completed_at",
       null
@@ -310,6 +330,106 @@ describe("coach account setup invitation resend", () => {
       /could not be delivered/i
     );
     expect(fake.table.update).toHaveBeenCalledTimes(2);
+    expect(fake.order).toEqual(["claim", "invite", "release"]);
+  });
+
+  it("sends password recovery when the invite was already confirmed without setup", async () => {
+    const fake = fakeSupabase({
+      inviteError: {
+        code: "email_exists",
+        message: "A user with this email address has already been registered",
+        status: 422,
+      },
+    });
+
+    await expect(
+      resendClientSetupInvite(
+        fake.client,
+        clientId,
+        "https://coach.example",
+        now
+      )
+    ).resolves.toEqual({
+      invitedAt: now.toISOString(),
+      delivery: "recovery",
+    });
+    expect(fake.resetPasswordForEmail).toHaveBeenCalledWith(
+      "client@example.com",
+      {
+        redirectTo: "https://coach.example/account/confirm?next=/dashboard",
+      }
+    );
+    expect(fake.order).toEqual(["claim", "invite", "recovery"]);
+    expect(fake.table.update).toHaveBeenCalledTimes(1);
+  });
+
+  it("releases the invitation claim when account recovery delivery fails", async () => {
+    const fake = fakeSupabase({
+      inviteError: {
+        code: "email_exists",
+        message: "User already registered",
+        status: 422,
+      },
+      recoveryError: { message: "SMTP provider unavailable", status: 503 },
+    });
+
+    await expectHttpError(
+      resendClientSetupInvite(
+        fake.client,
+        clientId,
+        "https://coach.example",
+        now
+      ),
+      502,
+      /could not be delivered/i
+    );
+    expect(fake.order).toEqual(["claim", "invite", "recovery", "release"]);
+    expect(fake.table.update).toHaveBeenCalledTimes(2);
+  });
+
+  it("releases the invitation claim when account recovery is unavailable", async () => {
+    const fake = fakeSupabase({
+      inviteError: {
+        code: "user_already_exists",
+        message: "User already registered",
+        status: 422,
+      },
+      recoveryThrows: true,
+    });
+
+    await expectHttpError(
+      resendClientSetupInvite(
+        fake.client,
+        clientId,
+        "https://coach.example",
+        now
+      ),
+      502,
+      /recovery service is unavailable/i
+    );
+    expect(fake.order).toEqual(["claim", "invite", "recovery", "release"]);
+    expect(fake.table.update).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not select recovery from an unstructured invite error message", async () => {
+    const fake = fakeSupabase({
+      inviteError: {
+        message: "An upstream record already exists unexpectedly",
+        status: 503,
+      },
+    });
+
+    await expectHttpError(
+      resendClientSetupInvite(
+        fake.client,
+        clientId,
+        "https://coach.example",
+        now
+      ),
+      409,
+      /account already exists/i
+    );
+    expect(fake.resetPasswordForEmail).not.toHaveBeenCalled();
     expect(fake.order).toEqual(["claim", "invite", "release"]);
   });
 

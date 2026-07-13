@@ -30,12 +30,16 @@ type ClientInvitePurchase = {
   checkout_status: string;
 };
 
+function isConfirmedAccountCode(error: { code?: string }) {
+  const code = String(error.code ?? "").toLowerCase();
+  return ["email_exists", "user_already_exists"].includes(code);
+}
+
 function inviteDeliveryError(error: {
   code?: string;
   message?: string;
   status?: number;
 }) {
-  const code = String(error.code ?? "").toLowerCase();
   const message = String(error.message ?? "");
   if (error.status === 429 || /rate.?limit|too many/i.test(message))
     return new HttpError(
@@ -43,7 +47,7 @@ function inviteDeliveryError(error: {
       "Account invitations are temporarily rate-limited. Wait before retrying."
     );
   if (
-    ["email_exists", "user_already_exists"].includes(code) ||
+    isConfirmedAccountCode(error) ||
     /already|registered|exists/i.test(message)
   )
     return new HttpError(
@@ -285,6 +289,30 @@ export async function resendClientSetupInvite(
     );
   }
   if (invite.error) {
+    // Only structured Auth error codes may select recovery. Supabase recovery
+    // is intentionally non-enumerating, so broad message matching here could
+    // otherwise report a false successful delivery.
+    if (isConfirmedAccountCode(invite.error)) {
+      let recovery: Awaited<
+        ReturnType<SupabaseClient["auth"]["resetPasswordForEmail"]>
+      >;
+      try {
+        recovery = await supabase.auth.resetPasswordForEmail(emailResult.data, {
+          redirectTo: `${portalOrigin}/account/confirm?next=/dashboard`,
+        });
+      } catch {
+        await releaseClaim();
+        throw new HttpError(
+          502,
+          "The account setup recovery service is unavailable. Try again later."
+        );
+      }
+      if (recovery.error) {
+        await releaseClaim();
+        throw inviteDeliveryError(recovery.error);
+      }
+      return { invitedAt, delivery: "recovery" as const };
+    }
     await releaseClaim();
     throw inviteDeliveryError(invite.error);
   }
@@ -296,7 +324,7 @@ export async function resendClientSetupInvite(
     );
   }
 
-  return { invitedAt };
+  return { invitedAt, delivery: "invite" as const };
 }
 
 export default async function handler(request: Request, _context: Context) {

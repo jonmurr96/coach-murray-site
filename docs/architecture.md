@@ -44,6 +44,18 @@ flowchart LR
 - RLS is enabled on every exposed table; clients can read only records linked through their `auth.uid()` after account setup is complete.
 - Card numbers and CVC never enter Coach Murray forms. Billing changes use Stripe Billing Portal.
 
+## Account lifecycle states
+
+| State              | Server evidence                                                                                                      | Client action                                                     | Coach recovery                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Checkout required  | No verified, allowlisted paid Checkout Session                                                                       | Complete Stripe Checkout                                          | None                                                                     |
+| Intake ready       | Paid session verified; intake not yet stored                                                                         | Complete onboarding with the checkout email                       | Review checkout or intake failure                                        |
+| Invitation pending | Immutable intake exists; Auth email is unconfirmed                                                                   | Open the scanner-safe invitation and select **Continue securely** | Resend after the cooldown; Supabase rotates the unconfirmed invite token |
+| Password pending   | Auth email is confirmed but the linked profile has no setup marker; Auth's internal invitation password never counts | Set a password from the active invite/recovery session            | **Resend account setup** falls back to password recovery for this state  |
+| Client ready       | Confirmed Auth user, nonempty password, paid completed purchase, and linked profile                                  | Sign in at `/sign-in`; server routes to `/dashboard`              | Manage from Coach OS                                                     |
+
+An intake replay never creates another invitation. A lost unconfirmed invitation can be reissued after the cooldown. If the email was already confirmed but password setup was abandoned, the coach action sends a recovery link instead; both links converge on the same password-update trigger and server-side readiness check.
+
 ## Removed legacy paths
 
 The standalone `onboarding.html`, `portal.html`, `admin.html`, raw JSX prototypes, compiled historical assets, and deployment script remain in the workspace only as provenance. `netlify.toml` publishes `dist`, so none are reachable in production.

@@ -80,6 +80,20 @@ describe("account lifecycle migration safeguards", () => {
     ),
     "utf8"
   );
+  const explicitSetupMigration = readFileSync(
+    path.join(
+      root,
+      "supabase/migrations/20260712233000_explicit_account_setup_completion.sql"
+    ),
+    "utf8"
+  );
+  const explicitPaidOnboardingMigration = readFileSync(
+    path.join(
+      root,
+      "supabase/migrations/20260712234500_paid_onboarding_explicit_setup.sql"
+    ),
+    "utf8"
+  );
 
   it("tracks invitation and completed setup separately", () => {
     expect(migration).toContain("account_invited_at timestamptz");
@@ -89,14 +103,19 @@ describe("account lifecycle migration safeguards", () => {
     );
   });
 
-  it("marks setup only from a confirmed auth user with a password", () => {
-    expect(migration).toContain(
-      "update of email, email_confirmed_at, encrypted_password"
+  it("marks setup only after an already-confirmed user changes the temporary password", () => {
+    expect(explicitSetupMigration).toContain(
+      "old.email_confirmed_at is not null"
     );
-    expect(migration).toContain("new.email_confirmed_at is null");
-    expect(migration).toContain("new.encrypted_password");
-    expect(migration).toContain("purchase.payment_status = 'paid'");
-    expect(migration).toContain("purchase.checkout_status = 'complete'");
+    expect(explicitSetupMigration).toContain(
+      "new.encrypted_password is distinct from old.encrypted_password"
+    );
+    expect(explicitSetupMigration).toContain(
+      "purchase.payment_status = 'paid'"
+    );
+    expect(explicitSetupMigration).toContain(
+      "purchase.checkout_status = 'complete'"
+    );
   });
 
   it("uses setup completion—not a merely linked user—as portal readiness", () => {
@@ -107,5 +126,9 @@ describe("account lifecycle migration safeguards", () => {
       "v_account_setup_completed_at is not null, true"
     );
     expect(migration).not.toContain("v_existing_user_id is not null");
+    expect(explicitPaidOnboardingMigration).toContain(
+      "select id, null::timestamptz"
+    );
+    expect(explicitPaidOnboardingMigration).not.toContain("encrypted_password");
   });
 });

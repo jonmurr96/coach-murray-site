@@ -93,7 +93,7 @@ pnpm release:check:candidate
 pnpm release:check
 ```
 
-The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, Stripe allowlist and deployed pricing-link mapping, the live Billing Portal configuration, disabled webhook safety, the canonical application schema, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function/private-route boundaries. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
+The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, active scanner-safe invite/recovery template configuration, Stripe allowlist and deployed pricing-link mapping, the live Billing Portal configuration, disabled webhook safety, the canonical application schema, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function/private-route boundaries. After pushing Auth config, confirm the same templates in the hosted Supabase dashboard before promotion. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
 
 ## 6. Future integrations
 

@@ -636,7 +636,11 @@ function ClientIntakeDialog({
       if (!result.invitedAt)
         throw new Error("The invitation was not confirmed by Coach OS.");
       setResentAt(result.invitedAt);
-      toast.success("Account setup invitation sent.");
+      toast.success(
+        result.delivery === "recovery"
+          ? "Password setup link sent."
+          : "Account setup invitation sent."
+      );
     } catch (error) {
       toast.error(
         error instanceof Error

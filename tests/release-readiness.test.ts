@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  authEmailTemplatesEnabled,
   expectedCheckoutRedirect,
   extractStripeUrls,
   isConfigured,
@@ -55,6 +56,24 @@ describe("release readiness helpers", () => {
     expect(senderDomain("Coach Murray <coaching@jonmurr.fit>")).toBe(
       "jonmurr.fit"
     );
+  });
+
+  it("requires active scanner-safe invite and recovery template configuration", () => {
+    const active = `
+      [auth.email.template.invite]
+      subject = "Create your account"
+      content_path = "./supabase/templates/invite.html"
+
+      [auth.email.template.recovery]
+      subject = "Reset your password"
+      content_path = "./supabase/templates/recovery.html"
+    `;
+    const commented = active
+      .split("\n")
+      .map(line => `# ${line}`)
+      .join("\n");
+    expect(authEmailTemplatesEnabled(active)).toBe(true);
+    expect(authEmailTemplatesEnabled(commented)).toBe(false);
   });
 
   it("requires the exact post-payment redirect including the session placeholder", () => {

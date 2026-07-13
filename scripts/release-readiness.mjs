@@ -72,6 +72,28 @@ export function senderDomain(value) {
   return (match?.[1] ?? match?.[2] ?? "").toLowerCase();
 }
 
+export function authEmailTemplatesEnabled(source) {
+  const paths = new Map();
+  let section = "";
+  for (const rawLine of String(source ?? "").split(/\r?\n/)) {
+    const line = rawLine.replace(/\s+#.*$/, "").trim();
+    if (!line || line.startsWith("#")) continue;
+    const sectionMatch = line.match(/^\[([^\]]+)\]$/);
+    if (sectionMatch) {
+      section = sectionMatch[1];
+      continue;
+    }
+    const pathMatch = line.match(/^content_path\s*=\s*["']([^"']+)["']$/);
+    if (section && pathMatch) paths.set(section, pathMatch[1]);
+  }
+  return (
+    paths.get("auth.email.template.invite") ===
+      "./supabase/templates/invite.html" &&
+    paths.get("auth.email.template.recovery") ===
+      "./supabase/templates/recovery.html"
+  );
+}
+
 export function expectedCheckoutRedirect(origin = PRODUCTION_ORIGIN) {
   return `${origin}/onboarding?session_id={CHECKOUT_SESSION_ID}`;
 }
@@ -326,6 +348,25 @@ export async function runReadiness({
     configuredDomain
       ? `${configuredDomain}: ${dnsReady ? "delegated" : "NXDOMAIN or undelegated"}`
       : "sender domain is not configured",
+    always
+  );
+  let authConfig = "";
+  try {
+    authConfig = await readFile(
+      new URL("../supabase/config.toml", import.meta.url),
+      "utf8"
+    );
+  } catch {
+    // Reported by the configuration check below.
+  }
+  safeCheck(
+    checks,
+    "email.auth_templates",
+    "Supabase scanner-safe email templates",
+    authEmailTemplatesEnabled(authConfig),
+    authEmailTemplatesEnabled(authConfig)
+      ? "invite and recovery templates enabled in deployable config"
+      : "invite/recovery template configuration is not active",
     always
   );
 

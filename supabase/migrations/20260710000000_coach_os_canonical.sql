@@ -242,7 +242,14 @@ begin
   set
     user_id = new.id,
     account_setup_completed_at = case
-      when nullif(btrim(coalesce(new.encrypted_password, '')), '') is not null
+      -- Supabase creates an internal random password while confirming an
+      -- invitation. Only a later password change on an already-confirmed user
+      -- proves that the client completed the app's password-setup screen.
+      when tg_op = 'UPDATE'
+        and old.email_confirmed_at is not null
+        and new.email_confirmed_at is not null
+        and new.encrypted_password is distinct from old.encrypted_password
+        and nullif(btrim(coalesce(new.encrypted_password, '')), '') is not null
         then coalesce(profile.account_setup_completed_at, now())
       else profile.account_setup_completed_at
     end
@@ -372,12 +379,11 @@ begin
     return;
   end if;
 
-  select
-    id,
-    case
-      when nullif(btrim(coalesce(encrypted_password, '')), '') is not null then now()
-      else null
-    end
+  -- A nonempty Auth password is not proof of app setup: Supabase assigns an
+  -- internal random password when an invitation is confirmed. Link a
+  -- confirmed pre-existing user, but require an explicit password change after
+  -- the paid profile exists before marking the portal ready.
+  select id, null::timestamptz
   into v_user_id, v_account_setup_completed_at
   from auth.users
   where lower(email) = lower(p_email) and email_confirmed_at is not null

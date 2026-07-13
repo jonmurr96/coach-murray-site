@@ -29,7 +29,7 @@ All 13 currently usable variables from `.env.example` are configured on `coach-m
 - Canonical project: `Coach-Murray`
 - Project ref: `emowlnxzcemeteiuftaj`
 - State: active and healthy
-- Canonical schema, three security/performance follow-up migrations, and the URL-resource Library guardrail migration are applied.
+- Canonical schema, three security/performance follow-up migrations, the URL-resource Library guardrail migration, and both explicit account-setup completion migrations are applied.
 - All public tables have RLS. Client reads are scoped to the signed user and published/assigned data; Coach OS uses role-checked Netlify Functions rather than browser-wide coach policies.
 - Hosted Auth is invite-only, anonymous sign-in is disabled, password minimum is 12 characters with lowercase/uppercase/digit requirements, refresh-token rotation is enabled, and password changes require recent authentication.
 - Production and candidate confirmation URLs are allowlisted. `supabase config push` reports remote Auth, API, and DB configuration up to date.
@@ -57,7 +57,7 @@ The branded scanner-safe templates already exist in `supabase/templates`. Do not
 
 ## Candidate verification evidence
 
-- `pnpm verify`: 93 tests plus production build passed.
+- Verification equivalent to `pnpm verify`: type-check, 98 tests, and production build passed.
 - `pnpm test:e2e`: 25 Chromium accessibility, access-boundary, mobile-auth-entry, and containment checks passed.
 - Trusted candidate lead submission wrote one lead and one submission to Supabase; the test record was verified and deleted.
 - Untrusted origin, anonymous session, and malformed checkout probes failed closed with `403`, `401`, and `400`.
