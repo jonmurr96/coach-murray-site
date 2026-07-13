@@ -69,6 +69,7 @@
 4. Run `pnpm verify` locally.
 5. Deploy a preview and exercise the QA matrix before promoting it.
 6. Confirm security headers, functions, redirects, and the exact public origin from the deployed site.
+7. On a Netlify plan with custom-scope support, mark service-role, Stripe, webhook, and Resend credentials as secret and Functions-scoped. On the current Developer plan, keep them as Netlify-managed encrypted variables; a scope/secret change is incomplete until a valid Stripe session and signed webhook both pass after redeployment.
 
 ## 5. Release acceptance matrix
 
@@ -93,7 +94,7 @@ pnpm release:check:candidate
 pnpm release:check
 ```
 
-The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, active scanner-safe invite/recovery template configuration, Stripe allowlist and deployed pricing-link mapping, the live Billing Portal configuration, disabled webhook safety, the canonical application schema, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function/private-route boundaries. After pushing Auth config, confirm the same templates in the hosted Supabase dashboard before promotion. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
+The candidate phase verifies the configured environment contract, exact Resend sender domain and DNS-record status, active Resend SMTP plus scanner-safe invite/recovery template configuration, Stripe allowlist and deployed pricing-link mapping, the live Billing Portal configuration, disabled webhook safety, the canonical application schema, Supabase Auth/data/owner boundaries, owner acceptance sign-in, and candidate Function/private-route boundaries. After pushing Auth config, confirm SMTP and the same templates in the hosted Supabase dashboard before promotion. The production phase additionally requires all four post-payment redirects, an enabled webhook, and live production Function boundaries. A nonzero result is a release block, not a reason to bypass the manual browser and vendor-log checks above.
 
 ## 6. Future integrations
 

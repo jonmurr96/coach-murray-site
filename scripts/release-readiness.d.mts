@@ -13,6 +13,10 @@ export function parseEnv(source: string): Record<string, string>;
 export function isConfigured(value: string | undefined): boolean;
 export function senderDomain(value: string | undefined): string;
 export function authEmailTemplatesEnabled(source: string | undefined): boolean;
+export function authEmailSmtpEnabled(
+  source: string | undefined,
+  domain: string | undefined
+): boolean;
 export function expectedCheckoutRedirect(origin?: string): string;
 export function paymentLinkIsProductionReady(
   paymentLink: unknown,

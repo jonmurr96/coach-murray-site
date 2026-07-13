@@ -22,7 +22,7 @@ The existing project split is preserved deliberately:
 
 The candidate was uploaded from the release branch through Netlify's managed deploy path. Its static routes, redirects, headers, Functions, Supabase connection, Stripe connection, client role boundary, and coach role boundary have been exercised. Production `coach-murray` was not overwritten.
 
-All 13 currently usable variables from `.env.example` are configured on `coach-murray`; `TRANSACTIONAL_FROM_EMAIL` is intentionally absent because no Resend domain is verified. The same runtime contract is present on the isolated candidate. The team's current Netlify plan accepts ordinary encrypted-at-rest environment variables, while the stricter Secrets Controller context/scope combination used in the first attempt was not exposed to Functions.
+All 13 currently usable variables from `.env.example` are configured on `coach-murray`; `TRANSACTIONAL_FROM_EMAIL` is intentionally absent because no Resend domain is verified. The same runtime contract is present on the isolated candidate. Netlify encrypts ordinary environment variables at rest, but the current Developer plan does not expose custom scopes. Live attempts to use Secrets Controller or Functions-only scopes returned `503` from otherwise healthy Stripe Functions, so the working all-scope configuration was restored and reverified without exposing values. Upgrading Netlify is required before those credentials can be made write-only and Functions-scoped.
 
 ## Supabase
 
@@ -57,7 +57,7 @@ The branded scanner-safe templates already exist in `supabase/templates`. Do not
 
 ## Candidate verification evidence
 
-- Verification equivalent to `pnpm verify`: type-check, 98 tests, and production build passed.
+- Verification equivalent to `pnpm verify`: type-check, 99 tests, and production build passed.
 - `pnpm test:e2e`: 25 Chromium accessibility, access-boundary, mobile-auth-entry, and containment checks passed.
 - Trusted candidate lead submission wrote one lead and one submission to Supabase; the test record was verified and deleted.
 - Untrusted origin, anonymous session, and malformed checkout probes failed closed with `403`, `401`, and `400`.

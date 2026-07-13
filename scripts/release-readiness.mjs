@@ -72,8 +72,8 @@ export function senderDomain(value) {
   return (match?.[1] ?? match?.[2] ?? "").toLowerCase();
 }
 
-export function authEmailTemplatesEnabled(source) {
-  const paths = new Map();
+function activeTomlSections(source) {
+  const sections = new Map();
   let section = "";
   for (const rawLine of String(source ?? "").split(/\r?\n/)) {
     const line = rawLine.replace(/\s+#.*$/, "").trim();
@@ -81,16 +81,38 @@ export function authEmailTemplatesEnabled(source) {
     const sectionMatch = line.match(/^\[([^\]]+)\]$/);
     if (sectionMatch) {
       section = sectionMatch[1];
+      if (!sections.has(section)) sections.set(section, new Map());
       continue;
     }
-    const pathMatch = line.match(/^content_path\s*=\s*["']([^"']+)["']$/);
-    if (section && pathMatch) paths.set(section, pathMatch[1]);
+    const settingMatch = line.match(/^([a-z_]+)\s*=\s*(.+)$/i);
+    if (!section || !settingMatch) continue;
+    const value = settingMatch[2].trim().replace(/^["']|["']$/g, "");
+    sections.get(section).set(settingMatch[1], value);
   }
+  return sections;
+}
+
+export function authEmailTemplatesEnabled(source) {
+  const sections = activeTomlSections(source);
   return (
-    paths.get("auth.email.template.invite") ===
+    sections.get("auth.email.template.invite")?.get("content_path") ===
       "./supabase/templates/invite.html" &&
-    paths.get("auth.email.template.recovery") ===
+    sections.get("auth.email.template.recovery")?.get("content_path") ===
       "./supabase/templates/recovery.html"
+  );
+}
+
+export function authEmailSmtpEnabled(source, domain) {
+  const smtp = activeTomlSections(source).get("auth.email.smtp");
+  if (!smtp || !domain) return false;
+  return (
+    smtp.get("enabled") === "true" &&
+    smtp.get("host") === "smtp.resend.com" &&
+    ["465", "587"].includes(smtp.get("port")) &&
+    smtp.get("user") === "resend" &&
+    smtp.get("pass") === "env(RESEND_API_KEY)" &&
+    senderDomain(smtp.get("admin_email")) === domain &&
+    Boolean(smtp.get("sender_name"))
   );
 }
 
@@ -359,6 +381,16 @@ export async function runReadiness({
   } catch {
     // Reported by the configuration check below.
   }
+  safeCheck(
+    checks,
+    "email.auth_smtp",
+    "Supabase production SMTP configuration",
+    authEmailSmtpEnabled(authConfig, configuredDomain),
+    authEmailSmtpEnabled(authConfig, configuredDomain)
+      ? "Resend SMTP enabled in deployable Auth config"
+      : "production SMTP configuration is not active",
+    always
+  );
   safeCheck(
     checks,
     "email.auth_templates",

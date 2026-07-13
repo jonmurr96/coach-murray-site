@@ -63,6 +63,15 @@ otp_expiry = 3600
 # verification. Leaving the section absent preserves the hosted SMTP setting.
 # Supabase's free tier also rejects hosted template changes while the default
 # mailer is active. Uncomment these blocks together with a verified SMTP block.
+# [auth.email.smtp]
+# enabled = true
+# host = "smtp.resend.com"
+# port = 465
+# user = "resend"
+# pass = "env(RESEND_API_KEY)"
+# admin_email = "coaching@YOUR_VERIFIED_DOMAIN"
+# sender_name = "Coach Murray"
+#
 # [auth.email.template.invite]
 # subject = "Create your Coach Murray account"
 # content_path = "./supabase/templates/invite.html"

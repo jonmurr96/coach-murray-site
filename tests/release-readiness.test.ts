@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  authEmailSmtpEnabled,
   authEmailTemplatesEnabled,
   expectedCheckoutRedirect,
   extractStripeUrls,
@@ -74,6 +75,26 @@ describe("release readiness helpers", () => {
       .join("\n");
     expect(authEmailTemplatesEnabled(active)).toBe(true);
     expect(authEmailTemplatesEnabled(commented)).toBe(false);
+  });
+
+  it("requires active Resend SMTP configuration for the verified sender domain", () => {
+    const active = `
+      [auth.email.smtp]
+      enabled = true
+      host = "smtp.resend.com"
+      port = 465
+      user = "resend"
+      pass = "env(RESEND_API_KEY)"
+      admin_email = "coaching@jonmurr.fit"
+      sender_name = "Coach Murray"
+    `;
+    expect(authEmailSmtpEnabled(active, "jonmurr.fit")).toBe(true);
+    expect(authEmailSmtpEnabled(active, "another-domain.com")).toBe(false);
+    const commented = active
+      .split("\n")
+      .map(line => `# ${line}`)
+      .join("\n");
+    expect(authEmailSmtpEnabled(commented, "jonmurr.fit")).toBe(false);
   });
 
   it("requires the exact post-payment redirect including the session placeholder", () => {
