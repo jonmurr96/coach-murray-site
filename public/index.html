@@ -1,0 +1,1305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Coach Murray - Online Fitness Coaching</title>
+<meta name="description" content="One-to-one online fitness coaching with custom training, practical nutrition, scheduled check-ins, and direct coach support."/>
+<link rel="icon" href="data:,"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin="anonymous"/>
+<link rel="preload" as="style" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap"/>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&amp;display=swap"/>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap" media="print" onload="this.media='all'"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&amp;display=swap" media="print" onload="this.media='all'"/>
+<noscript><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&amp;display=swap"/></noscript>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050507;--bgDeep:#020203;--surface:#0c0c10;
+  --glass:rgba(255,255,255,0.03);--gb:rgba(255,255,255,0.06);
+  --txt:#F4F1EA;--ts:rgba(255,255,255,0.72);--tm:#96938B;
+  --gold:#D4AA40;--goldL:#F0D070;--goldDim:rgba(212,170,64,0.1);--goldB:rgba(212,170,64,0.2);
+  --green:#3DDC84;--greenDim:rgba(61,220,132,0.08);
+  --blue:#4EA8DE;--pink:#E8647C;
+  --font:'Cabinet Grotesk',-apple-system,sans-serif;
+  --fontBody:'Fraunces',Georgia,serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth;scroll-padding-top:90px;max-width:100%;overflow-x:clip}
+body{background:var(--bg);color:var(--txt);font-family:var(--fontBody);font-size:16px;line-height:1.65;max-width:100%;overflow-x:clip;-webkit-font-smoothing:antialiased;font-optical-sizing:auto;font-variation-settings:"opsz" 14}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1;mix-blend-mode:overlay}
+/* Tabular numerics for stats, prices, percentages — prevents layout shift on data */
+.stat-num,.pkg-price,.pkg-price-mo{font-feature-settings:"tnum" 1,"ss01" 1;font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+button:focus{outline:none}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+/* Tactile press feedback on all interactive elements (design-taste §3 Rule 5) */
+.btn-primary:active,.btn-secondary:active,.pkg-cta:active,.nav-cta:active,.form-submit.ready:active,.chip:active{transform:translateY(1px) scale(.985)}
+.btn-primary,.btn-secondary,.pkg-cta,.nav-cta,.form-submit,.chip{will-change:transform}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+@keyframes shimmer{to{background-position:200% center}}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes orbFloat{0%{transform:translate(var(--ox),var(--oy)) scale(1)}100%{transform:translate(var(--ox),var(--oy)) scale(1.08)}}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .4s ease;padding:20px 32px}
+#nav.scrolled{background:rgba(5,5,7,0.95);border-bottom:1px solid var(--gb);backdrop-filter:blur(20px) saturate(180%)}
+.nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav-logo{display:flex;align-items:center;gap:14px;cursor:pointer;background:none;border:0;color:inherit;text-align:left;min-height:44px}
+.nav-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--gold) 0%,var(--goldL) 50%,var(--gold) 100%);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--bg);letter-spacing:-.5px}
+.nav-brand{font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:1px;line-height:1.2;text-transform:uppercase}
+.nav-sub{font-family:var(--font);font-size:9px;color:var(--tm);letter-spacing:2.5px;text-transform:uppercase;font-weight:500;margin-top:2px}
+.nav-links{display:flex;align-items:center;gap:24px;min-width:0}
+.nav-link{font-family:var(--font);font-size:11px;color:var(--tm);cursor:pointer;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;transition:color .3s;background:none;border:none;padding:6px 2px;position:relative}
+.nav-link::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.nav-link:hover{color:var(--txt)}
+.nav-link:hover::after{transform:scaleX(1)}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:4px}
+.nav-auth-link{min-height:44px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--gb);background:rgba(255,255,255,.025);color:var(--ts);font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;transition:color .3s,border-color .3s,background .3s}
+.nav-auth-link:hover{color:var(--gold);border-color:var(--goldB);background:var(--goldDim)}
+.nav-auth-link.coach{color:var(--tm);background:transparent}
+.nav-cta{min-height:44px;padding:11px 24px;border-radius:8px;cursor:pointer;background:var(--gold);font-family:var(--font);font-size:11px;font-weight:700;color:var(--bg);letter-spacing:1.5px;text-transform:uppercase;transition:all .3s var(--ease);border:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(212,170,64,0.3);background:var(--goldL)}
+.nav-mobile-actions{display:none;align-items:center;gap:6px;flex:0 0 auto}
+.nav-mobile-signin,.nav-mobile-cta{min-height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.nav-mobile-signin{padding:9px 10px;border:1px solid var(--goldB);background:rgba(5,5,7,.82);color:var(--gold)}
+.nav-mobile-signin.coach{border-color:var(--gb);color:var(--tm)}
+.nav-mobile-cta{padding:9px 14px;border:1px solid var(--gold);background:var(--gold);color:var(--bg)}
+@media(max-width:1040px){.nav-links{display:none}.nav-mobile-actions{display:flex}#nav{padding:14px 16px}}
+@media(max-width:430px){.nav-inner{gap:8px}.nav-logo{gap:9px}.nav-mobile-actions{gap:4px}.nav-mobile-signin{padding-left:8px;padding-right:8px}.nav-mobile-cta{padding-left:10px;padding-right:10px}}
+@media(max-width:370px){#nav{padding-left:10px;padding-right:10px}.nav-mark{width:34px;height:34px}.nav-brand{font-size:11px}.nav-sub{display:none}}
+.hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:center;padding:140px 32px 60px}
+.orb{position:absolute;border-radius:50%;filter:blur(var(--blur));pointer-events:none;animation:orbFloat 12s ease-in-out infinite alternate}
+.hero-line-v{position:absolute;top:20%;right:8%;width:1px;height:120px;background:linear-gradient(to bottom,var(--goldB),transparent);opacity:.5}
+.hero-line-h{position:absolute;bottom:25%;left:5%;width:80px;height:1px;background:linear-gradient(to right,var(--goldB),transparent);opacity:.4}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:1}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:32px}
+.hero-eyebrow-line{width:32px;height:1px;background:var(--gold)}
+.hero-eyebrow-text{font-family:var(--font);font-size:11px;font-weight:700;color:var(--gold);letter-spacing:3.5px;text-transform:uppercase}
+h1{font-family:var(--font);font-size:clamp(56px,8.5vw,108px);font-weight:800;line-height:.92;letter-spacing:-3.5px;margin:0 0 28px;max-width:900px}
+.h1-plain{color:var(--txt);display:block}
+.h1-shimmer{background:linear-gradient(135deg,var(--goldL) 0%,var(--gold) 40%,var(--goldL) 80%,var(--gold) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite;display:block;font-style:italic;font-weight:700}
+.hero-sub{font-family:var(--fontBody);font-size:19px;color:var(--ts);line-height:1.65;max-width:520px;margin-bottom:44px;font-weight:400;font-variation-settings:"opsz" 24}
+.hero-sub em{color:var(--gold);font-style:italic;font-weight:500}
+.hero-btns{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.btn-primary{padding:17px 38px;border-radius:10px;cursor:pointer;background:var(--gold);font-family:var(--font);font-size:13px;font-weight:700;color:var(--bg);display:inline-flex;align-items:center;gap:10px;letter-spacing:1.2px;text-transform:uppercase;box-shadow:0 4px 32px rgba(212,170,64,.2);transition:all .3s var(--ease);border:none;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--goldL),var(--gold));opacity:0;transition:opacity .3s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(212,170,64,.35)}
+.btn-primary:hover::before{opacity:1}
+.btn-primary>*{position:relative;z-index:1}
+.btn-secondary{padding:16px 30px;border-radius:10px;cursor:pointer;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);font-family:var(--font);font-size:12px;font-weight:600;color:var(--ts);letter-spacing:1.2px;text-transform:uppercase;transition:all .3s var(--ease)}
+.btn-secondary:hover{border-color:var(--goldB);color:var(--txt);background:rgba(255,255,255,.05)}
+.hero-stats{display:flex;gap:40px;margin-top:80px;flex-wrap:wrap;padding-top:32px;border-top:1px solid var(--gb)}
+.hero-stat{position:relative;padding-right:40px}
+.hero-stat:not(:last-child)::after{content:'';position:absolute;right:0;top:8px;bottom:8px;width:1px;background:var(--gb)}
+.stat-num{font-family:var(--font);font-size:38px;font-weight:800;color:var(--gold);letter-spacing:-2px;line-height:1}
+.stat-lbl{font-family:var(--font);font-size:10px;color:var(--tm);margin-top:6px;letter-spacing:2px;text-transform:uppercase;font-weight:500}
+.scroll-indicator{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.78}
+.scroll-line{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--tm))}
+.scroll-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt)}
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);padding:18px 0;background:var(--surface)}
+.ticker-inner{display:flex;animation:ticker 35s linear infinite;white-space:nowrap;width:max-content}
+.ticker-item{font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:4px;text-transform:uppercase;padding:0 28px}
+.ticker-star{color:var(--gold);font-family:serif;font-size:14px}
+.ticker-text{color:var(--tm)}
+.section{position:relative}
+.section-inner{max-width:1100px;margin:0 auto}
+.label-row{display:inline-flex;align-items:center;gap:12px;margin-bottom:18px}
+.label-line{height:1px;background:var(--gold)}
+.label-text{font-family:var(--font);font-size:11px;font-weight:700;color:var(--gold);letter-spacing:3.5px;text-transform:uppercase}
+.section-h2{font-family:var(--font);font-size:clamp(32px,4.5vw,52px);font-weight:800;letter-spacing:-2px;line-height:1.05}
+.section-h2 .gold{color:var(--gold);font-style:italic;font-family:var(--fontBody);font-weight:500}
+.section-h2 em{font-style:italic;font-family:var(--fontBody);font-weight:500;color:var(--gold)}
+.center{text-align:center}
+#about{padding:120px 32px}
+.about-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:64px;align-items:center}
+.about-card{border-radius:24px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--surface) 0%,rgba(212,170,64,.03) 100%);border:1px solid var(--gb);padding:40px;backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.4)}
+.about-card-corner{position:absolute;top:0;right:0;width:100px;height:100px;background:linear-gradient(225deg,rgba(212,170,64,.08) 0%,transparent 60%)}
+.about-photo{width:160px;height:160px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid var(--gold);box-shadow:0 8px 32px rgba(212,170,64,.3);margin:0 auto 24px;display:block}
+.about-name{font-family:var(--font);font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;text-align:center}
+.about-title-line{font-family:var(--fontBody);font-style:italic;font-size:14px;color:var(--gold);font-weight:500;margin-bottom:4px;text-align:center}
+.about-location{font-family:var(--font);font-size:11px;color:var(--tm);text-align:center;letter-spacing:1.5px;text-transform:uppercase}
+.about-divider{width:40px;height:1px;background:var(--gb);margin:22px auto}
+.about-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.about-tag{font-family:var(--font);font-size:10px;padding:5px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--gb);color:var(--tm);font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.about-h2{font-family:var(--font);font-size:clamp(32px,4.5vw,52px);font-weight:800;margin:0 0 28px;line-height:1.05;letter-spacing:-2px}
+.about-body{font-family:var(--fontBody);font-size:17px;color:var(--ts);line-height:1.75;margin-bottom:18px;font-variation-settings:"opsz" 18}
+.feat-list{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.feat{display:flex;align-items:center;gap:14px;font-family:var(--font);font-size:13px;color:var(--ts);font-weight:500;letter-spacing:.2px}
+.feat-dot{width:6px;height:6px;border-radius:3px;background:var(--gold);flex-shrink:0;box-shadow:0 0 12px rgba(212,170,64,.4)}
+#process{padding:100px 32px;background:var(--surface)}
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:60px}
+.process-card{padding:32px 26px;border-radius:18px;height:100%;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);position:relative;overflow:hidden;transition:border-color .4s var(--ease),background .4s var(--ease);cursor:default;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.process-card::after{content:'';position:absolute;top:0;left:0;height:1px;width:0;background:linear-gradient(90deg,var(--gold),transparent);transition:width .6s var(--ease)}
+.process-card:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.process-card:hover::after{width:65%}
+.process-num-bg{position:absolute;top:-30px;right:-15px;font-family:var(--font);font-size:120px;font-weight:900;color:rgba(255,255,255,.025);line-height:1;pointer-events:none;letter-spacing:-6px}
+.process-dot{width:8px;height:8px;border-radius:4px;margin-bottom:24px}
+.process-title{font-family:var(--font);font-size:17px;font-weight:700;margin-bottom:10px;letter-spacing:-.3px}
+.process-desc{font-family:var(--fontBody);font-size:14px;color:var(--tm);line-height:1.65}
+#packages{padding:120px 32px}
+.pkg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch;margin-top:60px}
+.pkg-wrap{border-radius:20px;height:100%;position:relative;overflow:hidden;transition:transform .4s var(--ease)}
+.pkg-wrap:hover{transform:translateY(-3px)}
+.pkg-wrap.featured{padding:2px;background:linear-gradient(160deg,var(--gold),var(--goldL),var(--gold));box-shadow:0 24px 60px -20px rgba(212,170,64,.18),0 8px 24px -10px rgba(0,0,0,.35)}
+.pkg-inner{padding:28px 22px;border-radius:inherit;height:100%;box-sizing:border-box;display:flex;flex-direction:column;transition:all .3s var(--ease)}
+.pkg-inner.std{background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);border-radius:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.pkg-inner.std:hover{border-color:rgba(212,170,64,.18)}
+.pkg-inner.feat{background:var(--bgDeep);border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.pkg-tag{align-self:flex-start;padding:5px 12px;border-radius:6px;margin-bottom:18px;font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}
+.pkg-name{font-family:var(--font);font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:-.5px}
+.pkg-price-row{margin-bottom:24px;display:flex;align-items:baseline;gap:4px}
+.pkg-price{font-family:var(--font);font-size:44px;font-weight:800;letter-spacing:-2.5px;line-height:1}
+.pkg-price-mo{font-family:var(--fontBody);font-style:italic;font-size:14px;color:var(--tm);font-weight:400}
+.pkg-features{flex:1;display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.pkg-feat{display:flex;align-items:flex-start;gap:10px;font-family:var(--fontBody);font-size:13px;color:var(--ts);line-height:1.5}
+.pkg-feat.gold-feat{color:var(--gold);font-weight:500}
+.check-icon::before{content:"✓";font-size:11px;font-weight:700}
+.pkg-cta{padding:14px 22px;border-radius:9px;cursor:pointer;text-align:center;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .3s var(--ease);border:none}
+.pkg-cta.gold-cta{background:var(--gold);color:var(--bg)}
+.pkg-cta.gold-cta:hover{background:var(--goldL);box-shadow:0 8px 24px rgba(212,170,64,.3)}
+.pkg-cta.outline-cta{background:rgba(255,255,255,.04);color:var(--ts);border:1px solid var(--gb)}
+.pkg-cta.outline-cta:hover{background:rgba(255,255,255,.08);color:var(--txt);border-color:var(--goldB)}
+#faq{padding:100px 32px;background:var(--surface)}
+.faq-list{display:flex;flex-direction:column;gap:8px;max-width:700px;margin:48px auto 0}
+.faq-item{border-radius:14px;overflow:hidden;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);transition:border-color .3s,background .3s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.faq-item:hover{background:rgba(255,255,255,.025)}
+.faq-item.open{border-color:var(--goldB);background:rgba(212,170,64,.025)}
+.faq-q{padding:20px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:var(--font);font-size:15px;font-weight:600;letter-spacing:-.2px;transition:color .3s;min-height:44px}
+.faq-q:hover .faq-q-text{color:var(--gold)}
+.faq-item.open .faq-q-text{color:var(--gold)}
+.faq-q-text{padding-right:18px}
+.faq-chevron{flex-shrink:0;transition:transform .5s cubic-bezier(0.34,1.2,0.64,1);color:var(--tm);font-size:14px}
+.faq-item.open .faq-chevron{transform:rotate(180deg);color:var(--gold)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(0.34,1.2,0.64,1)}
+.faq-item.open .faq-a{max-height:400px}
+.faq-a-inner{padding:0 24px 22px;font-family:var(--fontBody);font-size:15px;color:var(--ts);line-height:1.7;margin:0}
+#apply{padding:120px 32px}
+.apply-inner{max-width:1100px;margin:0 auto}
+.apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-top:56px}
+.apply-form-wrap{padding:36px 32px;border-radius:24px;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.form-field{margin-bottom:22px}
+.form-label{display:block;font-family:var(--font);font-size:11px;font-weight:700;color:var(--tm);margin-bottom:8px;letter-spacing:1.5px;text-transform:uppercase}
+.form-req{color:var(--gold)}
+.form-input{width:100%;padding:14px 16px;font-family:var(--fontBody);font-size:15px;color:var(--txt);background:rgba(255,255,255,.03);border:1px solid var(--gb);border-radius:10px;box-sizing:border-box;transition:border-color .25s,background .25s,box-shadow .25s;outline:none;min-height:44px}
+.form-input:focus{border-color:var(--gold);background:rgba(255,255,255,.05);box-shadow:0 0 0 3px rgba(212,170,64,.12)}
+.form-input::placeholder{color:var(--tm);font-style:italic}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 18px;border-radius:8px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;letter-spacing:.5px;background:rgba(255,255,255,.02);color:var(--tm);border:1px solid var(--gb);transition:all .2s var(--ease);min-height:44px;display:inline-flex;align-items:center}
+.chip:hover{background:rgba(255,255,255,.05);color:var(--ts);border-color:rgba(255,255,255,.12)}
+.chip.active{background:var(--goldDim);color:var(--gold);border-color:var(--goldB)}
+.form-submit{padding:17px 28px;border-radius:10px;cursor:pointer;text-align:center;width:100%;font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 24px rgba(212,170,64,.2);transition:all .3s var(--ease);border:none}
+.form-submit.ready{background:var(--gold);color:var(--bg)}
+.form-submit.ready:hover{background:var(--goldL);box-shadow:0 8px 32px rgba(212,170,64,.3)}
+.form-submit.disabled{background:rgba(255,255,255,.04);color:var(--tm);opacity:.4;cursor:not-allowed;box-shadow:none}
+.success-wrap{padding:56px 32px;border-radius:24px;text-align:center;background:var(--glass);border:1px solid rgba(61,220,132,.12);backdrop-filter:blur(8px);animation:fadeSlideUp .5s ease forwards;display:none}
+.success-icon-wrap{width:60px;height:60px;border-radius:30px;margin:0 auto 20px;background:var(--greenDim);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(61,220,132,.15);font-size:24px}
+.success-h3{font-family:var(--font);font-size:24px;font-weight:800;margin:0 0 10px;letter-spacing:-.5px}
+.success-body{font-family:var(--fontBody);font-size:15px;color:var(--ts);margin:0;line-height:1.65}
+.client-login-link{display:inline-flex;min-height:44px;align-items:center;margin-top:12px;color:var(--gold);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.3px;text-decoration:none}
+.client-login-link:hover{text-decoration:underline;text-underline-offset:4px}
+.cal-wrap{background:var(--glass);border:1px solid var(--gb);border-radius:24px;overflow:hidden;backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.cal-head{padding:24px 28px;border-bottom:1px solid var(--gb)}
+.cal-head-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.cal-icon{width:38px;height:38px;border-radius:8px;background:var(--goldDim);border:1px solid var(--goldB);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold)}
+.cal-title{font-family:var(--font);font-size:17px;font-weight:700;letter-spacing:-.3px}
+.cal-meta{display:flex;gap:18px;flex-wrap:wrap}
+.cal-meta-item{font-family:var(--fontBody);font-size:13px;color:var(--tm);display:flex;align-items:center;gap:6px}
+.cal-body iframe{display:block;width:100%;min-height:520px;border:none}
+.cal-placeholder{padding:60px 28px;text-align:center}
+.cal-placeholder-title{font-family:var(--font);font-size:17px;font-weight:700;color:var(--gold);margin-bottom:14px;letter-spacing:-.3px}
+.cal-placeholder-body{font-family:var(--fontBody);font-size:15px;color:var(--ts);line-height:1.7}
+.cal-placeholder-body a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--goldB);transition:color .2s}
+.cal-placeholder-body a:hover{color:var(--goldL)}
+footer{padding:56px 32px;border-top:1px solid var(--gb)}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.footer-logo{display:flex;align-items:center;gap:14px}
+.footer-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--goldL));display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:12px;font-weight:800;color:var(--bg)}
+.footer-name{font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.2px}
+.footer-copy{font-family:var(--font);font-size:10px;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.footer-social{display:flex;align-items:center;justify-content:flex-end;gap:4px 18px;flex-wrap:wrap}
+.social-btn{min-height:44px;display:flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:600;color:var(--tm);cursor:pointer;transition:color .3s;background:none;border:none;padding:6px 0}
+.social-btn:hover{color:var(--gold)}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(0.16,1,0.3,1),transform .8s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:none}
+
+/* ════════════════════════════════════════════════════════════════
+   FOUNDATION LAYER v2 — ATHLETIC EDITORIAL + ENGINEERED FLOURISHES
+   Builds on taste-skill: motion 7, variance 6, density 4
+═══════════════════════════════════════════════════════════════════ */
+
+/* New easing tokens */
+:root{
+  --ease-magnetic:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-cinematic:cubic-bezier(0.65,0,0.35,1);
+  --glow-gold:0 0 0 1px rgba(212,170,64,0.4),0 0 32px -8px rgba(212,170,64,0.6);
+}
+
+/* — Magnetic button system (cursor pull) — */
+[data-magnetic]{
+  transition:transform .35s var(--ease-magnetic);
+  will-change:transform
+}
+[data-magnetic]>*{pointer-events:none}
+
+/* — Spotlight system (cursor-tracking gradient on cards) — */
+[data-spotlight]{position:relative;overflow:hidden}
+[data-spotlight]::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(212,170,64,.10),transparent 50%);
+  opacity:0;transition:opacity .4s var(--ease);pointer-events:none;z-index:0
+}
+[data-spotlight]:hover::after{opacity:1}
+[data-spotlight]>*{position:relative;z-index:1}
+
+/* — Parallax tilt (package cards) — */
+[data-tilt]{
+  transform-style:preserve-3d;
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .4s var(--ease)
+}
+[data-tilt].tilting{transition:none}
+[data-tilt]>*{transform:translateZ(20px)}
+
+/* — Reveal v2 variants — */
+[data-reveal="mask"]{
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path 1.1s var(--ease-cinematic)
+}
+[data-reveal="mask"].visible{clip-path:inset(0 0 0 0)}
+
+[data-reveal="letters"] .letter{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(14px) rotate(4deg);
+  transition:opacity .6s var(--ease-cinematic),transform .7s var(--ease-magnetic);
+  transition-delay:calc(var(--i,0) * 28ms)
+}
+[data-reveal="letters"] .letter.space{width:.28em}
+[data-reveal="letters"].visible .letter{opacity:1;transform:translateY(0) rotate(0)}
+
+/* — Odometer digit-flip — */
+.odometer{display:inline-flex;font-variant-numeric:tabular-nums;line-height:1;vertical-align:baseline}
+.odometer-digit{display:inline-block;overflow:hidden;height:1em;position:relative}
+.odometer-track{display:flex;flex-direction:column;transition:transform 1.1s var(--ease-cinematic)}
+.odometer-track span{height:1em;line-height:1;display:block}
+.odometer-suffix{font-family:var(--font);font-size:.36em;font-weight:600;color:var(--tm);margin-left:3px;align-self:flex-start;margin-top:.18em;font-variant-numeric:tabular-nums}
+
+/* — Hero: kinetic letter wrapper, parallax orbs, stat tick — */
+.h1-letters{display:block}
+.h1-letters .letter{display:inline-block;will-change:transform,opacity}
+.orb[data-depth]{will-change:transform}
+.hero-stat .stat-tick{display:block;width:0;height:1px;background:var(--gold);margin-top:8px;transition:width .8s var(--ease-cinematic) .2s}
+.hero-stat.visible .stat-tick{width:32px}
+.scroll-indicator .scroll-line{position:relative;overflow:hidden}
+.scroll-indicator .scroll-line::after{
+  content:'';position:absolute;left:0;right:0;top:0;height:6px;background:var(--gold);
+  animation:scrollDot 2.2s var(--ease-cinematic) infinite
+}
+@keyframes scrollDot{0%{transform:translateY(-100%);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(2000%);opacity:0}}
+
+/* — H1 chromatic aberration on initial load only — */
+.h1-shimmer.aberrant{
+  text-shadow:1px 0 0 rgba(232,100,124,.55),-1px 0 0 rgba(78,168,222,.55);
+  animation:aberrantFade .9s var(--ease-cinematic) 1.2s forwards
+}
+@keyframes aberrantFade{to{text-shadow:0 0 0 transparent}}
+
+/* — Blueprint grid background (process + proof) — */
+.blueprint-bg{position:relative;isolation:isolate}
+.blueprint-bg::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(212,170,64,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(212,170,64,.06) 1px,transparent 1px);
+  background-size:24px 24px;
+  mask-image:radial-gradient(ellipse 70% 70% at center,#000 30%,transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 70% at center,#000 30%,transparent 80%);
+  pointer-events:none;z-index:0
+}
+.blueprint-bg.proof-grid-bg::before{
+  background-image:
+    linear-gradient(rgba(212,170,64,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(212,170,64,.04) 1px,transparent 1px)
+}
+
+/* — Corner notches (engineered flourish) — */
+.corner-notch{position:absolute;width:14px;height:14px;border:1px solid var(--gold);opacity:.55;pointer-events:none}
+.corner-notch.tl{top:8px;left:8px;border-right:none;border-bottom:none}
+.corner-notch.tr{top:8px;right:8px;border-left:none;border-bottom:none}
+.corner-notch.bl{bottom:8px;left:8px;border-right:none;border-top:none}
+.corner-notch.br{bottom:8px;right:8px;border-left:none;border-top:none}
+
+/* — Stat odometer + needle (proof) — */
+.proof-stat{position:relative;overflow:hidden}
+.proof-stat .proof-needle{display:block;width:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin:6px 0 10px;transition:width .8s var(--ease-cinematic) .9s}
+.proof-stat.visible .proof-needle{width:64px}
+.proof-stat .proof-lbl::before{
+  content:'';display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--gold);margin-right:8px;vertical-align:middle;
+  animation:lblPulse 3s ease-in-out infinite
+}
+@keyframes lblPulse{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* — Process bento cards: scroll-drawn top connector + blueprint + notches — */
+.bento-card{isolation:isolate}
+.bento-card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background-image:
+    linear-gradient(rgba(212,170,64,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(212,170,64,.05) 1px,transparent 1px);
+  background-size:24px 24px;
+  mask-image:radial-gradient(ellipse 60% 60% at 70% 30%,#000 20%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 60% 60% at 70% 30%,#000 20%,transparent 75%);
+  pointer-events:none;z-index:0
+}
+.bento-card>*{position:relative;z-index:1}
+.bento-card .corner-notch{opacity:0;transition:opacity .6s var(--ease-cinematic) .3s}
+.bento-card.visible .corner-notch{opacity:.55}
+.bento-card .bento-num{transition:color .3s,letter-spacing .3s}
+.bento-card:hover .bento-num{color:var(--gold);letter-spacing:3px}
+
+/* — Package cards: flag-shape tags (replace pill) — */
+.pkg-tag{
+  position:absolute;top:0;right:0;
+  padding:8px 14px 8px 16px !important;
+  border-radius:0 18px 0 0 !important;
+  font-family:var(--font);font-size:9.5px !important;
+  font-weight:700 !important;letter-spacing:2px;text-transform:uppercase;
+  clip-path:polygon(8px 0,100% 0,100% 100%,0 100%);
+  z-index:2
+}
+
+/* — Package card tilt host — */
+.pkg-grid{perspective:1200px}
+.pkg-inner{transform-style:preserve-3d;transition:transform .45s var(--ease),border-color .4s,box-shadow .4s,background .4s}
+.pkg-inner.tilting{transition:border-color .4s,box-shadow .4s,background .4s}
+.pkg-inner>*{transform:translateZ(8px)}
+.pkg-inner.feat{box-shadow:0 28px 60px -20px rgba(212,170,64,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+
+/* — Package CTA shimmer when ready — */
+.pkg-cta{position:relative;overflow:hidden}
+.pkg-cta::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.16) 45%,rgba(255,255,255,.32) 50%,rgba(255,255,255,.16) 55%,transparent 70%);
+  transform:translateX(-100%);transition:transform .9s var(--ease-cinematic);pointer-events:none
+}
+.pkg-cta:hover::before{transform:translateX(100%)}
+.pkg-cta.loading{pointer-events:none;opacity:.7}
+.pkg-cta.loading span{display:none}
+.pkg-cta.loading::after{content:'•••';animation:dotPulse 1.1s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* — FAQ: convert from accordion to editorial wall — */
+.faq-list{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:60px;text-align:left}
+.faq-item{
+  position:relative;
+  padding:24px 24px 24px 0;
+  border-top:1px solid rgba(212,170,64,.12);
+  cursor:default
+}
+.faq-item:nth-child(odd){padding-right:32px}
+.faq-item:nth-child(even){padding-left:32px;border-left:1px solid rgba(212,170,64,.08)}
+.faq-item::before{display:none !important}
+.faq-q{cursor:default !important;padding:0 !important;display:block !important}
+.faq-chevron{display:none}
+.faq-q-text{display:block !important;align-items:initial !important;font-family:var(--font);font-size:17px !important;font-weight:600;letter-spacing:-.3px;margin-bottom:12px;color:var(--txt) !important;line-height:1.35}
+.faq-a{
+  max-height:none !important;
+  opacity:1 !important;
+  overflow:visible !important;
+  padding:0 !important;
+  margin:0 !important
+}
+.faq-a-inner{font-family:var(--fontBody);font-size:14.5px;color:var(--ts);line-height:1.7;max-width:55ch;padding:0 !important}
+@media(max-width:768px){
+  .faq-list{grid-template-columns:1fr}
+  .faq-item:nth-child(odd),.faq-item:nth-child(even){padding-left:0;padding-right:0;border-left:none}
+  .faq-item:nth-child(1){border-top:1px solid rgba(212,170,64,.12)}
+}
+
+/* — Apply form: floating labels + underline-only style — */
+.form-field{position:relative;margin:0 0 32px;border:0;min-width:0}
+.form-label{
+  position:absolute;left:0;top:14px;
+  font-family:var(--font);font-size:13px;color:var(--tm);
+  letter-spacing:.4px;font-weight:500;
+  pointer-events:none;
+  transition:transform .25s var(--ease-cinematic),font-size .25s,color .25s;
+  transform-origin:left top;z-index:1
+}
+.form-field.floating .form-label,
+.form-field.has-value .form-label,
+.form-input:focus + .form-label{
+  transform:translateY(-14px) scale(.82);
+  color:var(--gold)
+}
+.form-input{
+  width:100%;padding:14px 0 10px;background:transparent;
+  border:none !important;border-bottom:1px solid var(--gb) !important;border-radius:0 !important;
+  font-family:var(--fontBody);font-size:16px;color:var(--txt);
+  outline:none;transition:border-color .3s
+}
+.form-input:focus{border-bottom-color:var(--gold) !important}
+.form-input::placeholder{opacity:0;transition:opacity .25s}
+.form-field.floating .form-input::placeholder{opacity:.4}
+.form-valid-tick{
+  position:absolute;right:0;top:14px;opacity:0;
+  transform:scale(.6);color:var(--gold);
+  transition:opacity .3s var(--ease-cinematic),transform .35s var(--ease-magnetic)
+}
+.form-field.valid .form-valid-tick{opacity:1;transform:scale(1)}
+.form-err{color:var(--pink);font-family:var(--fontBody);font-style:italic;font-size:12.5px;margin-top:6px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s,max-height .25s}
+.form-field.error .form-err{opacity:1;max-height:32px}
+.form-field.error .form-input{border-bottom-color:var(--pink) !important}
+
+/* — Chip selected state (gold fill, dark text) — */
+.chip.active{
+  background:var(--gold) !important;
+  color:var(--bg) !important;
+  border-color:var(--gold) !important
+}
+
+/* — Submit button states — */
+.form-submit.ready{
+  background:linear-gradient(110deg,var(--gold),var(--goldL),var(--gold));
+  background-size:200% 100%;
+  animation:shimmer 2.4s linear infinite
+}
+.form-submit.submitting{pointer-events:none}
+.form-submit.submitting span{display:none}
+.form-submit.submitting::after{content:'•••';animation:dotPulse 1s ease-in-out infinite}
+.form-submit.success{
+  width:56px !important;padding:0 !important;border-radius:50% !important;
+  background:var(--gold) !important;transition:all .5s var(--ease-magnetic)
+}
+.form-submit.success span{display:none}
+.form-submit.success::after{content:'✓';font-size:22px;color:var(--bg);font-weight:700}
+
+/* — Section connector dots (subtle scroll-path) — */
+.section-dot{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:.4;z-index:2}
+
+/* — Nav scroll-tightening — */
+#nav.scrolled{padding:12px 32px}
+#nav.scrolled .nav-brand{letter-spacing:.5px}
+
+/* — Reduced-motion override extension — */
+@media(prefers-reduced-motion:reduce){
+  [data-tilt]{transform:none !important}
+  [data-spotlight]::after{display:none}
+  [data-reveal="letters"] .letter{opacity:1 !important;transform:none !important}
+  [data-reveal="mask"]{clip-path:none !important}
+  .h1-shimmer.aberrant{text-shadow:none !important;animation:none !important}
+  .odometer-track{transition:none !important}
+}
+/* ═════════════════════════ END FOUNDATION LAYER v2 ═════════════════════════ */
+
+/* ── SCROLL PROGRESS BAR (design-taste §8 Scroll Progress Path) ── */
+.scroll-prog{position:fixed;top:0;left:0;right:0;height:2px;background:transparent;z-index:101;pointer-events:none}
+.scroll-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--goldL),var(--gold));width:0%;transition:width .12s linear;box-shadow:0 0 12px rgba(212,170,64,.5)}
+
+/* ── HERO PHOTO COLUMN (split-screen asymmetric) ── */
+.hero-grid-2col{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:center}
+@media(max-width:1024px){.hero-grid-2col{grid-template-columns:1fr;gap:48px}}
+.hero-photo-wrap{position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;box-shadow:0 32px 80px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);transform:rotate(.8deg)}
+.hero-photo-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,#1a1a1f 0%,#0c0c10 50%,#181820 100%);z-index:0}
+.hero-photo-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 30% 30%,rgba(212,170,64,.18) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 70% 80%,rgba(78,168,222,.08) 0%,transparent 60%);z-index:1}
+.hero-photo-monogram{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;font-family:var(--font);font-size:160px;font-weight:900;color:rgba(255,255,255,.04);letter-spacing:-12px}
+.hero-photo-tag{position:absolute;bottom:24px;left:24px;right:24px;z-index:3;backdrop-filter:blur(12px);background:rgba(8,8,10,.65);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.hero-photo-tag-l{display:flex;flex-direction:column}
+.hero-photo-tag-name{font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:-.3px}
+.hero-photo-tag-sub{font-family:var(--fontBody);font-style:italic;font-size:12px;color:var(--gold);margin-top:2px}
+.hero-photo-tag-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.hero-photo-tag-stat{font-family:var(--font);font-size:18px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.hero-photo-tag-lbl{font-family:var(--font);font-size:8.5px;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── HERO LIVE INDICATOR (perpetual micro-interaction) ── */
+.live-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.2);font-family:var(--font);font-size:11px;font-weight:600;color:var(--green);letter-spacing:.8px;margin-bottom:20px;backdrop-filter:blur(8px)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);position:relative;flex-shrink:0}
+.live-dot::after{content:'';position:absolute;inset:-2px;border-radius:50%;background:var(--green);opacity:.5;animation:livePulse 2s ease-out infinite}
+@keyframes livePulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.5);opacity:0}}
+
+/* ── KINETIC SVG LINE in hero ── */
+.hero-line-svg{position:absolute;top:18%;right:5%;z-index:0;pointer-events:none;opacity:.5}
+.hero-line-svg path{stroke:var(--gold);stroke-width:1;fill:none;stroke-dasharray:600;stroke-dashoffset:600;animation:drawLine 3s cubic-bezier(0.16,1,0.3,1) .5s forwards}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+
+/* ── BENTO PROCESS GRID ── */
+.bento-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto;gap:14px;margin-top:60px}
+.bento-card{padding:32px 28px;border-radius:18px;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);position:relative;overflow:hidden;transition:border-color .4s var(--ease),background .4s var(--ease),transform .4s var(--ease);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.bento-card::after{content:'';position:absolute;top:0;left:0;height:1px;width:0;background:linear-gradient(90deg,var(--gold),transparent);transition:width .8s var(--ease)}
+.bento-card:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);transform:translateY(-3px)}
+.bento-card:hover::after{width:75%}
+.bento-card-1{grid-column:span 2;grid-row:span 1}
+.bento-card-svg{width:42px;height:42px;margin-bottom:24px;color:var(--gold)}
+.bento-num{position:absolute;top:24px;right:28px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--tm);letter-spacing:2px;font-variant-numeric:tabular-nums}
+.bento-title{font-family:var(--font);font-size:20px;font-weight:700;margin-bottom:10px;letter-spacing:-.5px}
+.bento-desc{font-family:var(--fontBody);font-size:14px;color:var(--tm);line-height:1.65;max-width:38ch}
+@media(max-width:1024px){.bento-grid{grid-template-columns:repeat(2,1fr)}.bento-card-1{grid-column:span 2}}
+@media(max-width:640px){.bento-grid{grid-template-columns:1fr}.bento-card-1{grid-column:span 1}}
+
+/* ── PULL QUOTE in About ── */
+.pull-quote{margin:48px 0 32px;padding:32px 0;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);position:relative}
+.pull-quote-mark{position:absolute;top:-20px;left:0;font-family:var(--fontBody);font-style:italic;font-size:120px;line-height:1;color:var(--gold);opacity:.18;font-weight:300}
+.pull-quote-text{font-family:var(--fontBody);font-style:italic;font-weight:400;font-size:clamp(22px,2.6vw,30px);line-height:1.35;color:var(--txt);letter-spacing:-.4px;font-variation-settings:"opsz" 32;padding-left:48px}
+.pull-quote-text em{color:var(--gold);font-weight:500}
+
+/* ── SOCIAL PROOF BAND (NEW SECTION) ── */
+#proof{padding:100px 32px;background:radial-gradient(ellipse at 30% 50%,rgba(212,170,64,.04) 0%,transparent 50%),var(--bg);position:relative;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb)}
+.proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px}
+@media(max-width:768px){.proof-grid{grid-template-columns:repeat(2,1fr);gap:16px}}
+.proof-stat{padding:32px 24px;border-radius:16px;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);text-align:left;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);transition:border-color .3s,background .3s}
+.proof-stat:hover{border-color:var(--goldB);background:rgba(212,170,64,.025)}
+.proof-num{font-family:var(--font);font-size:clamp(36px,4.5vw,52px);font-weight:800;color:var(--gold);letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:8px}
+.proof-num-sm{font-family:var(--font);font-size:18px;font-weight:600;color:var(--tm);margin-left:2px;font-variant-numeric:tabular-nums}
+.proof-lbl{font-family:var(--font);font-size:12px;color:var(--ts);letter-spacing:.5px;line-height:1.5;font-weight:500}
+
+/* ── FLOATING CTA PILL ── */
+.float-cta{position:fixed;bottom:24px;right:24px;z-index:99;padding:14px 24px;border-radius:30px;background:var(--gold);color:var(--bg);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;box-shadow:0 16px 40px -8px rgba(212,170,64,.5),0 4px 12px rgba(0,0,0,.4);display:inline-flex;align-items:center;gap:8px;transform:translateY(120px);opacity:0;transition:transform .5s cubic-bezier(0.34,1.2,0.64,1),opacity .4s,box-shadow .3s;cursor:pointer;border:none}
+.float-cta.show{transform:translateY(0);opacity:1}
+.float-cta:hover{box-shadow:0 20px 50px -8px rgba(212,170,64,.6),0 6px 16px rgba(0,0,0,.5)}
+.float-cta:active{transform:translateY(2px) scale(.97)}
+.float-cta svg{width:14px;height:14px}
+@media(max-width:480px){.float-cta{bottom:20px;right:20px;padding:12px 20px;font-size:12px}}
+
+/* ── ANIMATED GRADIENT BORDER on form ── */
+.apply-form-wrap{padding:36px 32px;border-radius:24px;background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);position:relative}
+.apply-form-wrap::before{content:'';position:absolute;inset:-1px;border-radius:24px;padding:1px;background:linear-gradient(135deg,transparent 30%,rgba(212,170,64,.4) 50%,transparent 70%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;background-size:200% 200%;animation:gradBorder 8s linear infinite;pointer-events:none;opacity:.6}
+@keyframes gradBorder{to{background-position:200% 200%}}
+
+/* ── FAQ Q. PREFIX ── */
+.faq-q-prefix{font-family:var(--fontBody);font-style:italic;font-weight:500;color:var(--gold);margin-right:14px;font-size:13px;font-variant-numeric:tabular-nums}
+.faq-item{position:relative}
+.faq-item::before{content:'';position:absolute;left:0;top:18px;bottom:18px;width:2px;background:var(--gold);transform:scaleY(0);transform-origin:top;transition:transform .5s cubic-bezier(0.34,1.2,0.64,1)}
+.faq-item.open::before{transform:scaleY(1)}
+
+/* ── KINETIC MARQUEE — dual row, opposite directions ── */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);padding:0;background:var(--surface);position:relative}
+.ticker-row{padding:14px 0;border-bottom:1px solid var(--gb)}
+.ticker-row:last-child{border-bottom:none}
+.ticker-inner{display:flex;animation:ticker 40s linear infinite;white-space:nowrap;width:max-content}
+.ticker-inner-rev{animation:tickerRev 50s linear infinite;animation-direction:reverse}
+@keyframes tickerRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media(max-width:768px){
+  h1{font-size:clamp(40px,12vw,60px);letter-spacing:-2.2px;line-height:1.02}
+  .hero{padding:120px 20px 60px;min-height:90dvh}
+  .hero-sub{font-size:17px;margin-bottom:36px}
+  .hero-stats{gap:24px;margin-top:56px;padding-top:24px}
+  .hero-stat{padding-right:24px}
+  .stat-num{font-size:30px}
+  .about-grid,.process-grid,.pkg-grid,.apply-grid{grid-template-columns:1fr;gap:32px}
+  #about,#process,#packages,#apply{padding:80px 20px}
+  #faq{padding:80px 20px}
+  .section-h2{font-size:30px;letter-spacing:-1.2px}
+  .about-h2{font-size:30px;letter-spacing:-1.2px}
+  .hero-line-v,.hero-line-h,.scroll-indicator{display:none}
+  .nav-cta{padding:9px 18px}
+  footer{padding:40px 20px}
+  .footer-inner{flex-direction:column;align-items:flex-start;gap:24px}
+  .footer-social{width:100%;justify-content:flex-start}
+  .pkg-grid{gap:14px}
+  .apply-form-wrap{padding:28px 22px}
+  .orb,.hero-line-svg{display:none}
+  [data-reveal="letters"] .letter{opacity:1;transform:none;transition:none}
+  .hero-photo-wrap{max-width:420px;width:100%;margin:0 auto}
+  .hero-btns .btn-primary,.hero-btns .btn-secondary{justify-content:center;min-height:48px}
+}
+@media(max-width:420px){.hero-btns{display:grid;grid-template-columns:1fr}.hero-btns .btn-primary,.hero-btns .btn-secondary{width:100%;padding-left:16px;padding-right:16px}.hero-stat{width:calc(50% - 12px);padding-right:0}.hero-stat::after{display:none!important}}
+.consent-row{display:flex;align-items:flex-start;gap:10px;margin:-10px 0 24px;font-family:var(--font);font-size:12px;line-height:1.5;color:var(--tm)}
+.consent-row input{width:18px;height:18px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
+.consent-row a{color:var(--gold)}
+.form-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+@media(min-width:769px) and (max-width:1024px){
+  .pkg-grid{grid-template-columns:repeat(2,1fr)}
+  .process-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="scroll-prog"><div class="scroll-prog-fill" id="scrollProg"></div></div>
+<!-- Gate-redirect notice (shows briefly if user tried /onboarding without payment) -->
+<div id="gateNotice" style="display:none;position:fixed;top:0;left:0;right:0;z-index:200;padding:14px 20px;background:rgba(212,170,64,.95);color:#050507;font-family:'Cabinet Grotesk',sans-serif;font-size:13.5px;font-weight:600;letter-spacing:.3px;text-align:center;backdrop-filter:blur(8px);box-shadow:0 4px 16px rgba(0,0,0,.3)">
+  <span>Onboarding is for active clients only. Choose your package below to get started.</span>
+  <button onclick="document.getElementById('gateNotice').style.display='none'" style="margin-left:14px;background:transparent;border:1px solid rgba(5,5,7,.4);color:#050507;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:4px;font-family:inherit">DISMISS</button>
+</div>
+<script>
+(function(){
+  if(/gate=onboarding-requires-payment/.test(location.search)){
+    var n=document.getElementById('gateNotice');
+    if(n)n.style.display='block';
+    // Scroll user to packages after a beat so the message lands
+    setTimeout(function(){
+      var pkg=document.getElementById('packages');
+      if(pkg)pkg.scrollIntoView({behavior:'smooth',block:'start'});
+    },700);
+    // Clean the URL so refreshes don't re-trigger
+    if(history.replaceState){history.replaceState(null,'',location.pathname);}
+  }
+})();
+</script>
+<nav id="nav">
+  <div class="nav-inner">
+    <button class="nav-logo" onclick="cmScroll('about')">
+      <div class="nav-mark">JM</div>
+      <div><div class="nav-brand">COACH MURRAY</div><div class="nav-sub">Online Coaching</div></div>
+    </button>
+    <div class="nav-links">
+      <button class="nav-link" onclick="cmScroll('about')">About</button>
+      <button class="nav-link" onclick="cmScroll('packages')">Packages</button>
+      <button class="nav-link" onclick="cmScroll('faq')">FAQ</button>
+      <div class="nav-actions" role="group" aria-label="Account and application links">
+        <a class="nav-auth-link" href="/sign-in">Client Sign In</a>
+        <a class="nav-auth-link coach" href="/coach/sign-in">Coach OS</a>
+        <button class="nav-cta" onclick="cmScroll('apply')" data-magnetic data-magnetic-radius="50" data-magnetic-travel="5">Apply Now</button>
+      </div>
+    </div>
+    <div class="nav-mobile-actions" role="group" aria-label="Account and application links">
+      <a class="nav-mobile-signin" href="/sign-in" aria-label="Client Sign In">Client</a>
+      <a class="nav-mobile-signin coach" href="/coach/sign-in" aria-label="Coach OS Sign In">Coach</a>
+      <button class="nav-mobile-cta" onclick="cmScroll('apply')">Apply</button>
+    </div>
+  </div>
+</nav>
+<main>
+<section class="hero">
+  <div class="orb" style="--ox:-10%;--oy:15%;--blur:140px;width:500px;height:500px;background:radial-gradient(circle,rgba(212,170,64,.06),transparent 70%);left:0;top:0;animation-duration:12s"></div>
+  <div class="orb" style="--ox:70%;--oy:60%;--blur:120px;width:400px;height:400px;background:radial-gradient(circle,rgba(78,168,222,.04),transparent 70%);left:0;top:0;animation-duration:15s"></div>
+  <div class="orb" style="--ox:50%;--oy:-5%;--blur:100px;width:300px;height:300px;background:radial-gradient(circle,rgba(212,170,64,.03),transparent 70%);left:0;top:0;animation-duration:18s"></div>
+  <svg class="hero-line-svg" width="280" height="180" viewBox="0 0 280 180"><path d="M10,160 Q70,100 130,120 T270,30"/></svg>
+  <div class="hero-line-v"></div>
+  <div class="hero-line-h"></div>
+  <div class="hero-grid-2col">
+    <div>
+      <div class="live-pill"><span class="live-dot"></span>1:1 online coaching · Huntsville, AL</div>
+      <div class="hero-eyebrow"><div class="hero-eyebrow-line"></div><span class="hero-eyebrow-text">Online Coaching</span></div>
+      <h1><span class="h1-plain">Build the</span><span class="h1-shimmer aberrant">body you deserve.</span></h1>
+      <p class="hero-sub">Science-backed programming. Personalized nutrition. Consistent accountability. Every plan built from scratch — for <em>you</em>.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="window.location.href='/quiz.html'" data-magnetic data-magnetic-radius="80" data-magnetic-travel="10">Find Your Plan — Free Quiz <span style="font-size:16px">→</span></button>
+        <button class="btn-secondary" onclick="cmScroll('packages')" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6">View Packages</button>
+      </div>
+      <a class="client-login-link" href="/sign-in">Already a client? Sign in to your dashboard →</a>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="stat-num">Custom</div><div class="stat-lbl">Every program</div><span class="stat-tick"></span></div>
+        <div class="hero-stat"><div class="stat-num">Scheduled</div><div class="stat-lbl">Check-ins</div><span class="stat-tick"></span></div>
+        <div class="hero-stat"><div class="stat-num">Direct</div><div class="stat-lbl">Coach access</div><span class="stat-tick"></span></div>
+        <div class="hero-stat"><div class="stat-num">1:1</div><div class="stat-lbl">Built for you</div><span class="stat-tick"></span></div>
+      </div>
+    </div>
+    <div class="hero-photo-wrap">
+      <div class="hero-photo-monogram">JM</div>
+      <div class="hero-photo-tag">
+        <div class="hero-photo-tag-l">
+          <span class="hero-photo-tag-name">Jonathon Murray</span>
+          <span class="hero-photo-tag-sub">Mechanical engineer · Competitor</span>
+        </div>
+        <div class="hero-photo-tag-r">
+          <span class="hero-photo-tag-stat">2nd</span>
+          <span class="hero-photo-tag-lbl">First Show</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator"><div class="scroll-line"></div><span class="scroll-text">Scroll</span></div>
+</section>
+<div class="ticker-wrap">
+  <div class="ticker-row"><div class="ticker-inner" id="tickerInner"></div></div>
+  <div class="ticker-row"><div class="ticker-inner ticker-inner-rev" id="tickerInner2"></div></div>
+</div>
+<section class="section" id="about">
+  <div style="padding:120px 32px">
+    <div class="section-inner">
+      <div class="about-grid reveal">
+        <div class="about-card">
+          <div class="about-card-corner"></div>
+          <div style="position:relative;z-index:1;text-align:center">
+            <img src="./profile.jpg" alt="Coach Jonathon Murray" class="about-photo" width="320" height="403" loading="lazy" decoding="async" onerror="this.style.display='none'"/>
+            <div class="about-name">Jonathon Murray</div>
+            <div class="about-title-line">Competitive Bodybuilder</div>
+            <div class="about-location">Huntsville, Alabama</div>
+            <div class="about-divider"></div>
+            <div class="about-tags">
+              <span class="about-tag">Mechanical Engineer</span>
+              <span class="about-tag">Competitor</span>
+              <span class="about-tag">Data-Driven</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="label-row"><div class="label-line" style="width:32px"></div><span class="label-text">Your Coach</span></div>
+          <h2 class="about-h2">Engineering precision.<br><em>Athlete mentality.</em></h2>
+          <p class="about-body">I'm a mechanical engineer by trade and a competitive bodybuilder by passion. That combination means your coaching is driven by data, not guesswork — every adjustment is based on real biofeedback, not bro science.</p>
+          <div class="pull-quote">
+            <span class="pull-quote-mark">"</span>
+            <p class="pull-quote-text">I compete at the same level <em>I coach.</em></p>
+          </div>
+          <p class="about-body">I placed 2nd in my first bodybuilding show and bring that same discipline to every client. Whether you're prepping for stage or just want to feel confident, I meet you where you are.</p>
+          <div class="feat-list">
+            <div class="feat"><div class="feat-dot"></div>Programs built around YOUR schedule &amp; equipment</div>
+            <div class="feat"><div class="feat-dot"></div>Scheduled check-ins with detailed coaching feedback</div>
+            <div class="feat"><div class="feat-dot"></div>Direct access — no chatbots, no assistants</div>
+            <div class="feat"><div class="feat-dot"></div>Adjustments based on real data, not templates</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="process" style="background:var(--surface)">
+  <div style="padding:100px 32px">
+    <div class="section-inner" style="max-width:1100px">
+      <div class="reveal center">
+        <div class="label-row" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">The Process</span><div class="label-line" style="width:32px"></div></div>
+        <h2 class="section-h2">Simple process. <em>Serious results.</em></h2>
+      </div>
+      <div class="bento-grid">
+        <div class="bento-card bento-card-1 reveal" data-spotlight>
+          <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+          <span class="bento-num">01</span>
+          <svg class="bento-card-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M40 24a16 16 0 1 1-32 0 16 16 0 0 1 32 0Z"/><path d="M24 16v8l5 3"/><circle cx="24" cy="24" r="2" fill="currentColor"/></svg>
+          <div class="bento-title">Discovery Call</div>
+          <div class="bento-desc">We talk through your goals, training history, and lifestyle. Free, 30 minutes, zero pressure. You leave with clarity even if we don't work together.</div>
+        </div>
+        <div class="bento-card reveal" data-spotlight>
+          <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+          <span class="bento-num">02</span>
+          <svg class="bento-card-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 36 L18 24 L26 30 L40 14"/><circle cx="40" cy="14" r="2" fill="currentColor"/><circle cx="26" cy="30" r="1.5" fill="currentColor"/><circle cx="18" cy="24" r="1.5" fill="currentColor"/><circle cx="8" cy="36" r="1.5" fill="currentColor"/></svg>
+          <div class="bento-title">Custom Plan</div>
+          <div class="bento-desc">Built from your data — not a template.</div>
+        </div>
+        <div class="bento-card reveal" data-spotlight>
+          <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+          <span class="bento-num">03</span>
+          <svg class="bento-card-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="10" width="32" height="30" rx="3"/><path d="M8 18h32"/><path d="M16 6v8M32 6v8"/><path d="M16 28l3 3 7-7"/></svg>
+          <div class="bento-title">Scheduled Check-ins</div>
+          <div class="bento-desc">Submit progress. Plan adjusts.</div>
+        </div>
+        <div class="bento-card reveal" data-spotlight>
+          <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+          <span class="bento-num">04</span>
+          <svg class="bento-card-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6v36"/><path d="M14 16l10-10 10 10"/><path d="M10 38h28"/></svg>
+          <div class="bento-title">Transform</div>
+          <div class="bento-desc">Trend the data the right way.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF BAND -->
+<section id="proof">
+  <div class="section-inner" style="max-width:1100px;margin:0 auto">
+    <div class="reveal center">
+      <div class="label-row" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">Coaching pillars</span><div class="label-line" style="width:32px"></div></div>
+      <h2 class="section-h2">Built around <em>execution.</em></h2>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-stat reveal" data-spotlight>
+        <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+        <div class="proof-num">01</div>
+        <span class="proof-needle"></span>
+        <div class="proof-lbl">Individual programming based on your experience, equipment, schedule, and goal</div>
+      </div>
+      <div class="proof-stat reveal" data-spotlight>
+        <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+        <div class="proof-num">02</div>
+        <span class="proof-needle"></span>
+        <div class="proof-lbl">Nutrition targets and practical guidance that fit real life</div>
+      </div>
+      <div class="proof-stat reveal" data-spotlight>
+        <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+        <div class="proof-num">03</div>
+        <span class="proof-needle"></span>
+        <div class="proof-lbl">Scheduled check-ins that turn your feedback into plan adjustments</div>
+      </div>
+      <div class="proof-stat reveal" data-spotlight>
+        <span class="corner-notch tl"></span><span class="corner-notch br"></span>
+        <div class="proof-num">04</div>
+        <span class="proof-needle"></span>
+        <div class="proof-lbl">Direct communication inside one private coaching workspace</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="packages">
+  <div style="padding:120px 32px">
+    <div class="section-inner" style="max-width:1160px">
+      <div class="reveal center" style="margin-bottom:60px">
+        <div class="label-row" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">Packages</span><div class="label-line" style="width:32px"></div></div>
+        <h2 class="section-h2">Invest in <span style="color:var(--gold)">yourself.</span></h2>
+        <p style="font-size:14px;color:var(--tm);margin-top:8px">Month-to-month · Cancel anytime · No contracts</p>
+      </div>
+      <div class="pkg-grid">
+        <div class="pkg-wrap reveal" style="transition-delay:.0s">
+          <div class="pkg-inner std" data-tilt data-tilt-max="5" data-spotlight onmouseenter="this.style.borderColor='rgba(61,220,132,0.3)'" onmouseleave="this.style.borderColor='var(--gb)'">
+            <div class="pkg-name">Nutrition</div>
+            <div class="pkg-price-row"><span class="pkg-price">$99</span><span class="pkg-price-mo">/mo</span></div>
+            <div class="pkg-features">
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Custom macro targets for your goals</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Personalized meal plan &amp; grocery lists</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Bi-weekly check-ins with feedback</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Supplement recommendations</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Direct messaging support</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Refeed &amp; diet break protocols</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Macro adjustments based on progress</div>
+            </div>
+            <button class="pkg-cta outline-cta" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6" data-stripe-url="https://buy.stripe.com/9B614ndTx6Hv7xz0i20000j" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Start Nutrition</button>
+          </div>
+        </div>
+        <div class="pkg-wrap reveal" style="transition-delay:.08s">
+          <div class="pkg-inner std" data-tilt data-tilt-max="5" data-spotlight onmouseenter="this.style.borderColor='rgba(78,168,222,0.3)'" onmouseleave="this.style.borderColor='var(--gb)'">
+            <div class="pkg-name">Training</div>
+            <div class="pkg-price-row"><span class="pkg-price">$119</span><span class="pkg-price-mo">/mo</span></div>
+            <div class="pkg-features">
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Fully customized training program</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Bi-weekly check-ins with feedback</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Exercise video demo library</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Progressive overload tracking</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Coach technique notes inside your program</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Program adjustments monthly</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Deload &amp; recovery programming</div>
+            </div>
+            <button class="pkg-cta outline-cta" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6" data-stripe-url="https://buy.stripe.com/4gM7sL16L0j70571m60000k" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Start Training</button>
+          </div>
+        </div>
+        <div class="pkg-wrap featured reveal" style="transition-delay:.16s">
+          <div class="pkg-inner feat" data-tilt data-tilt-max="7" data-spotlight>
+            <div class="pkg-tag" style="background:rgba(212,170,64,.15);color:var(--gold);border:1px solid rgba(212,170,64,.25)">BEST VALUE</div>
+            <div class="pkg-name">Full Coaching</div>
+            <div class="pkg-price-row"><span class="pkg-price" style="color:var(--gold)">$179</span><span class="pkg-price-mo">/mo</span></div>
+            <div class="pkg-features">
+              <div class="pkg-feat gold-feat"><span class="check-icon" style="color:var(--gold)"></span>Everything in Nutrition + Training</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Weekly check-ins (not bi-weekly)</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Progress trend analysis from weekly check-ins</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Priority message response</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Bi-weekly program adjustments</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Detailed biofeedback tracking</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Lifestyle &amp; habit coaching</div>
+              <div class="pkg-feat gold-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="margin-top:3px;flex-shrink:0;color:var(--gold)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Save $39/mo vs buying separately</div>
+            </div>
+            <button class="pkg-cta gold-cta" data-magnetic data-magnetic-radius="70" data-magnetic-travel="8" data-stripe-url="https://buy.stripe.com/cNiaEX7v99TH2dffcW0000l" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Get Full Coaching</button>
+          </div>
+        </div>
+        <div class="pkg-wrap reveal" style="transition-delay:.24s">
+          <div class="pkg-inner std" data-tilt data-tilt-max="5" data-spotlight onmouseenter="this.style.borderColor='rgba(232,100,124,0.3)'" onmouseleave="this.style.borderColor='var(--gb)'">
+            <div class="pkg-tag" style="background:rgba(232,100,124,.15);color:var(--pink);border:1px solid rgba(232,100,124,.25)">ELITE</div>
+            <div class="pkg-name">Contest Prep</div>
+            <div class="pkg-price-row"><span class="pkg-price">$249</span><span class="pkg-price-mo">/mo</span></div>
+            <div class="pkg-features">
+              <div class="pkg-feat gold-feat"><span class="check-icon" style="color:var(--gold)"></span>Everything in Full Coaching, plus:</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Daily coach access &amp; communication</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Peak week programming &amp; protocol</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Posing guidance &amp; scheduled reviews</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Stage-day game plan &amp; timeline</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Water &amp; sodium manipulation</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Post-show reverse diet strategy</div>
+              <div class="pkg-feat"><span class="check-icon" style="color:var(--green)"></span>Competition-specific cardio protocols</div>
+            </div>
+            <button class="pkg-cta outline-cta" data-magnetic data-magnetic-radius="60" data-magnetic-travel="6" data-stripe-url="https://buy.stripe.com/9B6eVdg1Fe9Xg45fcW0000m" onclick="var b=this;b.classList.add('loading');setTimeout(function(){window.location.href=b.dataset.stripeUrl;},420);">Start Contest Prep</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="faq" style="background:var(--surface)">
+  <div style="padding:100px 32px">
+    <div class="section-inner center">
+      <div class="label-row reveal" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">FAQ</span><div class="label-line" style="width:32px"></div></div>
+      <h2 class="section-h2 reveal">Common <span style="color:var(--gold)">questions.</span></h2>
+      <div class="faq-list" id="faqList">
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.01</span>What does online coaching actually look like?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">You'll receive a fully customized training program and nutrition plan through your client portal. At the cadence included in your package, submit your optional weight, energy, adherence, wins, and challenges. I review the signal, adjust your plan as needed, and reply inside the portal. You also have direct messaging access between check-ins.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.02</span>I'm a complete beginner — is this for me?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Absolutely. I work with everyone from first-time gym-goers to competitive bodybuilders. Your program is built for your experience level, equipment access, and schedule. You won't be thrown into anything that doesn't fit.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.03</span>How is this different from a free YouTube program?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">A YouTube program doesn't know your injury history, work schedule, stress levels, or how your body responds. I build and adjust based on real data from your check-ins. That feedback loop produces results — not the exercises themselves.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.04</span>What if I travel or miss a week?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Life happens. I'll program travel-friendly alternatives and adjust around vacations, work trips, or anything else. Consistency over perfection.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.05</span>Can I cancel anytime?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Yes. Month-to-month, no contracts. You're here because you're getting results, not because you're locked in.</p></div></div>
+        <div class="faq-item"><div class="faq-q"><span class="faq-q-text"><span class="faq-q-prefix">Q.06</span>How do I get started?</span><span class="faq-chevron">↓</span></div><div class="faq-a"><p class="faq-a-inner">Fill out the application below. I'll review your goals and follow up with the right next step. If it is a fit, we confirm the package and get your onboarding started.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="apply">
+  <div style="padding:120px 32px">
+    <div class="apply-inner">
+      <div class="reveal center" style="margin-bottom:0">
+        <div class="label-row" style="justify-content:center"><div class="label-line" style="width:32px"></div><span class="label-text">Apply</span><div class="label-line" style="width:32px"></div></div>
+        <h2 class="section-h2">Ready to <span style="color:var(--gold)">transform?</span></h2>
+        <p style="font-size:14px;color:var(--tm);margin-top:8px">Tell me what you are working toward and I will follow up with the right next step.</p>
+      </div>
+      <div class="apply-grid">
+        <div class="reveal" style="transition-delay:.1s;margin-top:56px">
+          <div class="apply-form-wrap" id="formWrap">
+            <form id="formFields">
+              <div class="form-field"><input class="form-input" id="fname" type="text" placeholder="Your name" autocomplete="name"/><label class="form-label" for="fname">Full Name *</label><span class="form-valid-tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="form-err">Please enter your name (2+ characters).</div></div>
+              <div class="form-field"><input class="form-input" id="femail" type="email" placeholder="you@email.com" autocomplete="email"/><label class="form-label" for="femail">Email *</label><span class="form-valid-tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div class="form-err">Please enter a valid email address.</div></div>
+              <fieldset class="form-field">
+                <legend class="form-label" style="position:static;transform:none;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:block">Primary Goal *</legend>
+                <div class="chip-group" id="goalChips">
+                  <button type="button" class="chip" data-val="Fat Loss" aria-pressed="false">Fat Loss</button>
+                  <button type="button" class="chip" data-val="Muscle Gain" aria-pressed="false">Muscle Gain</button>
+                  <button type="button" class="chip" data-val="Contest Prep" aria-pressed="false">Contest Prep</button>
+                  <button type="button" class="chip" data-val="General Fitness" aria-pressed="false">General Fitness</button>
+                  <button type="button" class="chip" data-val="Body Recomp" aria-pressed="false">Body Recomp</button>
+                </div>
+              </fieldset>
+              <fieldset class="form-field" style="margin-bottom:28px">
+                <legend class="form-label" style="position:static;transform:none;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:block">Timeline *</legend>
+                <div class="chip-group" id="timelineChips">
+                  <button type="button" class="chip" data-val="ASAP" aria-pressed="false">ASAP</button>
+                  <button type="button" class="chip" data-val="This month" aria-pressed="false">This month</button>
+                  <button type="button" class="chip" data-val="Next month" aria-pressed="false">Next month</button>
+                  <button type="button" class="chip" data-val="Exploring" aria-pressed="false">Exploring</button>
+                </div>
+              </fieldset>
+              <label class="consent-row" for="leadConsent"><input id="leadConsent" type="checkbox"/> <span>I agree that Coach Murray may use this information to respond to my application and send related coaching information. I can unsubscribe at any time. <a href="/privacy">Privacy</a>.</span></label>
+              <label class="form-honeypot" aria-hidden="true">Website<input id="leadWebsite" type="text" tabindex="-1" autocomplete="off"/></label>
+              <button type="submit" class="form-submit disabled" id="submitBtn" data-magnetic data-magnetic-radius="80" data-magnetic-travel="6">Submit Application <span>→</span></button>
+            </form>
+            <div class="success-wrap" id="successWrap" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
+              <div class="success-icon-wrap">✓</div>
+              <h3 class="success-h3">Application Received!</h3>
+              <p class="success-body" id="successMsg">Your application is saved. I will review it and follow up with the next step.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reveal" style="transition-delay:.2s;margin-top:56px">
+          <div class="cal-wrap">
+            <div class="cal-head">
+              <div class="cal-head-top"><div class="cal-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="cal-title">Plan a Strategy Call</div></div>
+              <div class="cal-meta"><span class="cal-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30-min free strategy call</span><span class="cal-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Google Meet</span></div>
+            </div>
+            <div class="cal-body"><div class="cal-placeholder"><div class="cal-placeholder-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;display:inline-block"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Request a Free Call</div><div class="cal-placeholder-body">Submit the application or email <a href="mailto:jonmurr.fit@gmail.com">jonmurr.fit@gmail.com</a>. Available time slots will be confirmed directly rather than shown as a live calendar before one is connected.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<!-- FLOATING CTA -->
+<a href="#apply" onclick="cmScroll('apply');return false;" class="float-cta" id="floatCta" aria-label="Apply Now" data-magnetic data-magnetic-radius="80" data-magnetic-travel="8">
+  Apply Now
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="footer-mark">JM</div>
+      <div><div class="footer-name">Coach Jonathon Murray</div><div class="footer-copy">© 2026 · Engineered in Huntsville, AL</div></div>
+    </div>
+    <div class="footer-social">
+      <a class="social-btn" href="https://instagram.com/Jonmurr" target="_blank" rel="noopener" aria-label="Instagram @Jonmurr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @Jonmurr</a>
+      <a class="social-btn" href="mailto:jonmurr.fit@gmail.com" aria-label="Email Coach Murray"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Email</a>
+      <a class="social-btn" href="/sign-in">Client Sign In</a>
+      <a class="social-btn" href="/coach/sign-in">Coach OS</a>
+      <a class="social-btn" href="/privacy">Privacy</a>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+'use strict';
+var formData={name:'',email:'',goal:'',timeline:'',consent:false};
+var submitting=false;
+var reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ═══════════ FOUNDATION LAYER v2 — Motion Systems ═══════════
+// Shared rAF-throttled mouse tracker (powers magnetic + spotlight + tilt)
+var mouse={x:0,y:0,raf:null};
+function onMove(e){
+  mouse.x=e.clientX;mouse.y=e.clientY;
+  if(mouse.raf)return;
+  mouse.raf=requestAnimationFrame(function(){
+    mouse.raf=null;
+    // Magnetic elements
+    document.querySelectorAll('[data-magnetic]').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      var cx=r.left+r.width/2,cy=r.top+r.height/2;
+      var dx=mouse.x-cx,dy=mouse.y-cy;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      var radius=parseFloat(el.dataset.magneticRadius||'70');
+      var travel=parseFloat(el.dataset.magneticTravel||'8');
+      if(dist<radius){
+        var f=(1-dist/radius)*travel;
+        el.style.transform='translate3d('+(dx/dist*f)+'px,'+(dy/dist*f)+'px,0)';
+      }else{
+        el.style.transform='';
+      }
+    });
+    // Spotlight elements (only if hovered)
+    document.querySelectorAll('[data-spotlight]:hover').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      el.style.setProperty('--mx',((mouse.x-r.left)/r.width*100)+'%');
+      el.style.setProperty('--my',((mouse.y-r.top)/r.height*100)+'%');
+    });
+    // Tilt elements (only if hovered)
+    document.querySelectorAll('[data-tilt]:hover').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      var px=(mouse.x-r.left)/r.width-.5;
+      var py=(mouse.y-r.top)/r.height-.5;
+      var max=parseFloat(el.dataset.tiltMax||'6');
+      el.style.setProperty('--ry',(px*max)+'deg');
+      el.style.setProperty('--rx',(-py*max)+'deg');
+      el.classList.add('tilting');
+    });
+    // Orb parallax (lightweight)
+    document.querySelectorAll('.orb[data-depth]').forEach(function(el){
+      var depth=parseFloat(el.dataset.depth);
+      var dx=(mouse.x-window.innerWidth/2)*depth;
+      var dy=(mouse.y-window.innerHeight/2)*depth;
+      el.style.setProperty('--ox','calc('+el.dataset.basex+' + '+dx+'px)');
+      el.style.setProperty('--oy','calc('+el.dataset.basey+' + '+dy+'px)');
+    });
+  });
+}
+if(!reducedMotion){window.addEventListener('mousemove',onMove,{passive:true});}
+
+// Tilt cleanup on leave
+document.addEventListener('mouseout',function(e){
+  if(e.target.matches&&e.target.matches('[data-tilt]')){
+    e.target.style.setProperty('--rx','0deg');
+    e.target.style.setProperty('--ry','0deg');
+    setTimeout(function(){e.target.classList.remove('tilting');},50);
+  }
+});
+
+// — Reveal v2: split h1 letters into spans —
+document.querySelectorAll('[data-reveal="letters"]').forEach(function(el){
+  var html=el.innerHTML;
+  // Already split? skip
+  if(el.querySelector('.letter'))return;
+  // Walk text nodes only to preserve nested <em>/<span> structure
+  function walkAndSplit(node){
+    var i=0;
+    Array.from(node.childNodes).forEach(function(child){
+      if(child.nodeType===3){ // text node
+        var frag=document.createDocumentFragment();
+        Array.from(child.textContent).forEach(function(ch){
+          var s=document.createElement('span');
+          s.className='letter'+(ch===' '?' space':'');
+          s.style.setProperty('--i',i++);
+          s.textContent=ch;
+          frag.appendChild(s);
+        });
+        child.replaceWith(frag);
+      }else if(child.nodeType===1){
+        walkAndSplit(child);
+      }
+    });
+  }
+  walkAndSplit(el);
+});
+
+// — Odometer counter (digit-flip) —
+function odometerInit(el){
+  if(el.dataset.odoReady)return;
+  var target=parseInt(el.dataset.count,10);
+  var suffix=el.dataset.suffix||'';
+  var digits=String(target).split('');
+  el.innerHTML='';
+  el.classList.add('odometer');
+  digits.forEach(function(d){
+    var col=document.createElement('span');
+    col.className='odometer-digit';
+    var trk=document.createElement('span');
+    trk.className='odometer-track';
+    // Stack 0 through target digit
+    for(var i=0;i<=parseInt(d,10);i++){
+      var sp=document.createElement('span');
+      sp.textContent=i;
+      trk.appendChild(sp);
+    }
+    col.appendChild(trk);
+    el.appendChild(col);
+  });
+  if(suffix){
+    var sfx=document.createElement('span');
+    sfx.textContent=suffix;
+    sfx.className='odometer-suffix';
+    el.appendChild(sfx);
+  }
+  el.dataset.odoReady='1';
+}
+function odometerRun(el){
+  el.querySelectorAll('.odometer-track').forEach(function(trk){
+    var last=trk.lastElementChild;
+    if(!last)return;
+    var h=last.offsetHeight;
+    var count=trk.children.length-1;
+    trk.style.transform='translateY('+(-h*count)+'px)';
+  });
+}
+
+// — Init: scroll handler (existing logic preserved, nav scroll added) —
+window.addEventListener('scroll',function(){
+  var nav=document.getElementById('nav');
+  var prog=document.getElementById('scrollProg');
+  var fcta=document.getElementById('floatCta');
+  var sy=window.scrollY;
+  nav.classList.toggle('scrolled',sy>50);
+  if(prog){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    var pct=h>0?(sy/h)*100:0;
+    prog.style.width=pct+'%';
+  }
+  if(fcta){fcta.classList.toggle('show',sy>700);}
+},{passive:true});
+
+window.cmScroll=function(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});};
+
+// — Existing reveal observer — */
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var siblings=Array.from(e.target.parentElement.querySelectorAll('.reveal'));var i=siblings.indexOf(e.target);if(i>=0&&i<10){e.target.style.transitionDelay=(i*70)+'ms';}e.target.classList.add('visible');}});},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+
+// — Reveal v2 observer (letters + mask variants) —
+var revealV2=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){e.target.classList.add('visible');revealV2.unobserve(e.target);}
+  });
+},{threshold:0.2,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('[data-reveal="letters"],[data-reveal="mask"]').forEach(function(el){revealV2.observe(el);});
+
+// — Stat / odometer counter on enter (preserves old API, adds odometer support) —
+var statObs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      var el=e.target;
+      if(el.dataset.odometer==='1'){
+        odometerInit(el);
+        // small delay so layout settles before animating tracks
+        requestAnimationFrame(function(){requestAnimationFrame(function(){odometerRun(el);});});
+      }else{
+        var target=parseInt(el.dataset.count,10);
+        var suffix=el.dataset.suffix||'';
+        var dur=1400;var start=null;
+        function tick(ts){
+          if(!start)start=ts;
+          var p=Math.min((ts-start)/dur,1);
+          var eased=1-Math.pow(1-p,3);
+          el.textContent=Math.floor(target*eased)+suffix;
+          if(p<1)requestAnimationFrame(tick);else el.textContent=target+suffix;
+        }
+        requestAnimationFrame(tick);
+      }
+      // also trigger parent hero-stat .visible class for tick line
+      var parent=el.closest('.hero-stat,.proof-stat');
+      if(parent)parent.classList.add('visible');
+      statObs.unobserve(el);
+    }
+  });
+},{threshold:0.5});
+document.querySelectorAll('.stat-num[data-count],.proof-num[data-count]').forEach(function(el){statObs.observe(el);});
+
+// — Orb parallax base position setup —
+document.querySelectorAll('.orb').forEach(function(orb,i){
+  var depths=['0.05','0.10','0.18','0.26'];
+  orb.dataset.depth=depths[i]||'0.1';
+  orb.dataset.basex=orb.style.getPropertyValue('--ox')||'0%';
+  orb.dataset.basey=orb.style.getPropertyValue('--oy')||'0%';
+});
+
+var TICKER=['DATA-DRIVEN COACHING','\u2726','CUSTOM TRAINING','\u2726','MACRO NUTRITION','\u2726','WEEKLY ACCOUNTABILITY','\u2726','CONTEST PREP','\u2726','BODY RECOMP','\u2726','PROGRESSIVE OVERLOAD','\u2726'];
+var TICKER2=['ENGINEERING-GRADE PROGRAMS','\u2726','WEEKLY CHECK-INS','\u2726','DIRECT COACH ACCESS','\u2726','DATA-DRIVEN ADJUSTMENTS','\u2726','HUNTSVILLE, AL','\u2726','INDIVIDUAL PROGRAMMING','\u2726','EVIDENCE-BASED','\u2726'];
+function buildTicker(id,arr){var w=document.getElementById(id);if(!w)return;var f=arr.concat(arr);f.forEach(function(t){var s=document.createElement('span');s.className='ticker-item '+(t==='\u2726'?'ticker-star':'ticker-text');s.textContent=t;w.appendChild(s);});}
+buildTicker('tickerInner',TICKER);
+buildTicker('tickerInner2',TICKER2);
+
+// — FAQ is now a wall (no accordion needed) but keep keyboard accessibility —
+// (legacy accordion handler removed — items render open by default in v2)
+
+function setupChips(groupId,key){document.querySelectorAll('#'+groupId+' .chip').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('#'+groupId+' .chip').forEach(function(b){b.classList.remove('active');b.setAttribute('aria-pressed','false');});btn.classList.add('active');btn.setAttribute('aria-pressed','true');formData[key]=btn.dataset.val;updateSubmitBtn();updateFieldStates();});});}
+setupChips('goalChips','goal');setupChips('timelineChips','timeline');
+
+// — Floating labels + inline validation —
+var emailRe=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function updateFieldStates(){
+  var fname=document.getElementById('fname');
+  var femail=document.getElementById('femail');
+  [fname,femail].forEach(function(inp){
+    var field=inp.closest('.form-field');
+    if(!field)return;
+    var v=inp.value.trim();
+    field.classList.toggle('has-value',v.length>0);
+    field.classList.toggle('floating',document.activeElement===inp||v.length>0);
+    var valid=inp.id==='fname'?v.length>=2:emailRe.test(v);
+    field.classList.toggle('valid',valid&&v.length>0);
+    if(v.length>0)field.classList.remove('error');
+  });
+}
+['fname','femail'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.addEventListener('input',function(){
+    formData[id==='fname'?'name':'email']=this.value;
+    updateFieldStates();updateSubmitBtn();
+  });
+  el.addEventListener('focus',updateFieldStates);
+  el.addEventListener('blur',updateFieldStates);
+});
+var consent=document.getElementById('leadConsent');
+if(consent){consent.addEventListener('change',function(){formData.consent=this.checked;updateSubmitBtn();});}
+function updateSubmitBtn(){var btn=document.getElementById('submitBtn');var ready=formData.name.length>=2&&emailRe.test(formData.email)&&formData.goal&&formData.timeline&&formData.consent;btn.className='form-submit '+(ready?'ready':'disabled');btn.disabled=!ready;}
+
+// — Apply form submission to Jonmurr.fit Supabase / coaching_applications —
+document.getElementById('formFields').addEventListener('submit',function(event){
+  event.preventDefault();
+  if(submitting)return;
+  var ferr={fname:formData.name.length<2,femail:!emailRe.test(formData.email),goal:!formData.goal,timeline:!formData.timeline,consent:!formData.consent};
+  // Mark any errors
+  var anyErr=false;
+  ['fname','femail'].forEach(function(id){
+    var field=document.getElementById(id).closest('.form-field');
+    if(ferr[id]){field.classList.add('error');anyErr=true;}
+  });
+  if(ferr.goal||ferr.timeline||ferr.consent){anyErr=true;}
+  if(anyErr)return;
+  submitting=true;
+  var btn=document.getElementById('submitBtn');
+  btn.classList.add('submitting');
+  var nameParts=formData.name.trim().split(/\s+/);
+  fetch('/.netlify/functions/lead-submit',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+    },
+    body:JSON.stringify({
+      kind:'application',
+      firstName:nameParts.shift()||formData.name.trim(),
+      lastName:nameParts.join(' '),
+      email:formData.email.trim().toLowerCase(),
+      source:'website application',
+      marketingConsent:formData.consent,
+      website:(document.getElementById('leadWebsite')||{}).value||'',
+      metadata:{goal:formData.goal,timeline:formData.timeline}
+    })
+  }).then(function(r){
+    if(r.ok){
+      btn.classList.remove('submitting');btn.classList.add('success');
+      setTimeout(function(){
+        document.getElementById('formFields').style.display='none';
+        var sw=document.getElementById('successWrap');
+        sw.style.display='block';
+        document.getElementById('successMsg').textContent='Thanks '+formData.name.split(' ')[0]+'. Your application is saved. I will review it and follow up with the right next step.';
+        sw.focus();
+      },700);
+    }else{
+      r.text().then(function(t){console.error('Supabase insert failed',r.status,t);});
+      throw new Error(r.status);
+    }
+  }).catch(function(){
+    submitting=false;btn.classList.remove('submitting');
+    updateSubmitBtn();
+    var field=document.getElementById('femail').closest('.form-field');
+    field.classList.add('error');
+    var err=field.querySelector('.form-err');
+    if(err)err.textContent='Something went wrong. Email jonmurr.fit@gmail.com directly.';
+  });
+});
+})();
+</script>
+</body>
+</html>
