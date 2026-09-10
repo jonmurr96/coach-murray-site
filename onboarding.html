@@ -4,8 +4,32 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>New Client Onboarding — Coach Murray</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- ═══════════════════════════════════════════════════════════════
+     ACCESS GATE — Only paid users (Stripe session_id present)
+     This is a soft gate. Bulletproof verification requires a server-side
+     check against Stripe's API. See README for upgrade path.
+═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var sid=p.get('session_id');           // Stripe injects this on success_url
+    var pkg=p.get('package');              // legacy/fallback param
+    var local=sessionStorage.getItem('cm_paid');  // grace flag for refreshes
+    // Valid Stripe checkout session IDs look like: cs_test_... or cs_live_...
+    var validSession = sid && /^cs_(test|live)_[A-Za-z0-9]{20,}$/.test(sid);
+    if(validSession){
+      // Remember this session for the duration of the tab so refreshes don't bounce
+      sessionStorage.setItem('cm_paid','1');
+      sessionStorage.setItem('cm_session',sid);
+      if(pkg)sessionStorage.setItem('cm_package',pkg);
+    } else if(!local){
+      // No valid session, no local grace flag → not paid → bounce
+      location.replace('/?gate=onboarding-requires-payment');
+    }
+  }catch(e){/* if anything fails, fail closed */location.replace('/');}
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -127,6 +151,7 @@ canvas{width:100%;height:88px;border-radius:9px;background:var(--s2);border:1px 
 .pkg-back{display:inline-flex;align-items:center;font-size:12px;color:var(--td);cursor:pointer;margin-bottom:16px;text-decoration:none;transition:color .15s}
 .pkg-back:hover{color:var(--ts)}
 </style>
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/onboarding-theme.css">
 </head>
 <body>
 <div class="wrap">
@@ -142,11 +167,12 @@ canvas{width:100%;height:88px;border-radius:9px;background:var(--s2);border:1px 
     <div class="dots" id="dots"></div>
   </div>
   <div class="card" id="card"></div>
-  <div class="foot">Secure &amp; Confidential &nbsp;·&nbsp; <a href="mailto:Infiniteautomationz@gmail.com">Contact Coach Murray</a></div>
+  <div class="foot">Secure &amp; Confidential &nbsp;·&nbsp; <a href="mailto:jonmurr.fit@gmail.com">Contact Coach Murray</a></div>
 </div>
 <script>
 (function() {
 'use strict';
+
 // ── HELPERS ──
 function g(id){ return document.getElementById(id); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -180,6 +206,7 @@ function pbox(side,label){
 }
 function infoBox(html){ return '<div class="info">'+html+'</div>'; }
 function divider(){ return '<div class="hr"></div>'; }
+
 // ── PACKAGES ──
 var PACKAGES = {
   nutrition:{ label:'Nutrition Plan', price:'$99/mo', color:'#3B8BD4', emoji:'🥗' },
@@ -187,6 +214,7 @@ var PACKAGES = {
   coaching:{ label:'Full Coaching', price:'$179/mo', color:'#BA7517', emoji:'⚡' },
   contest:{ label:'Contest Prep', price:'$249/mo', color:'#D4537E', emoji:'🏆' }
 };
+
 // ── STATE ──
 var PKG_KEY = (location.search.match(/[?&]package=([^&]+)/)||[])[1]||'';
 var pkg = PACKAGES[PKG_KEY]||null;
@@ -194,6 +222,7 @@ var step = 0;
 var steps = [];
 var D = {};
 var photoFiles = {};
+
 function initData(){
   D = {
     firstName:'',lastName:'',email:'',phone:'',dob:'',gender:'',
@@ -223,6 +252,7 @@ function initData(){
   photoFiles = {};
 }
 initData();
+
 // ── SHARED STEPS ──
 function stepPersonal(){
   return '<span class="pkg-back" data-action="changepkg">&#8592; Change package</span>'+
@@ -237,6 +267,7 @@ function stepPersonal(){
     fld('Gender',true,sel('gender',['Male','Female','Prefer not to say'],D.gender),'gender')+
     '</div>';
 }
+
 function stepBodyStats(extra){
   return '<div class="stag">Step '+(step+1)+' of '+steps.length+'</div>'+
     '<h2>Body Stats</h2>'+
@@ -250,6 +281,7 @@ function stepBodyStats(extra){
     fld('Goal Weight (lbs)',false,inp('goalWeight','170','number',D.goalWeight),'goalWeight')+
     (extra||'');
 }
+
 function stepFinal(){
   return '<div class="stag">Step '+(step+1)+' of '+steps.length+' — Final Step</div>'+
     '<h2>Almost There</h2>'+
@@ -268,6 +300,7 @@ function stepFinal(){
     '<canvas id="sigCanvas"></canvas><div class="sig-meta"><span class="sig-clear" data-action="clearsig">Clear</span>&nbsp;·&nbsp;Sign above with mouse or finger</div>',
     'signature');
 }
+
 // ── NUTRITION STEPS ──
 var NUT_STEPS = [
   stepPersonal,
@@ -306,6 +339,7 @@ var NUT_STEPS = [
     fld('Daily Water Intake',false,chips('waterIntake',['Under 4 cups','4–6 cups','6–8 cups','8–10 cups','10+ cups'],false),'waterIntake'); },
   stepFinal
 ];
+
 // ── TRAINING STEPS ──
 var TRN_STEPS = [
   stepPersonal,
@@ -348,6 +382,7 @@ var TRN_STEPS = [
     fld('Current Stress Level',false,slider('stressLevel',1,10,'Very Low','Very High'),'stressLevel'); },
   stepFinal
 ];
+
 // ── COACHING STEPS ──
 var COA_STEPS = [
   stepPersonal,
@@ -378,7 +413,7 @@ var COA_STEPS = [
     fld('Meals Per Day',false,chips('mealsPerDay',['1–2','3','4','5+','Varies'],false),'mealsPerDay')+
     fld('Dietary Restrictions',false,chips('dietaryRestrictions',['None','Vegetarian','Vegan','Gluten-Free','Dairy-Free','Halal'],true),'dietaryRestrictions')+
     '</div>'+
-    fld('Food allergies',false,inp('foodAllergies','Any restrictions or allergies. Or "None."','text',D.foodAllergies),'foodAllergies')+
+    fld('Food allergies',false,inp('foodAllergies','e.g. Tree nuts, shellfish...','text',D.foodAllergies),'foodAllergies')+
     fld('Foods you love',false,ta('foodsLove','Your go-to foods, favorites, staples...',D.foodsLove),'foodsLove')+
     fld('Foods you won\'t eat',false,ta('foodsHate','Anything completely off the table...',D.foodsHate),'foodsHate')+
     fld('Biggest nutrition struggle',false,chips('nutritionStruggle',['Eating too much','Not eating enough','Weekend slip-ups','No structure','Emotional eating','No time to cook'],true),'nutritionStruggle'); },
@@ -402,6 +437,7 @@ var COA_STEPS = [
     '<div class="pgrid">'+pbox('front','Front')+pbox('side','Side')+pbox('back','Back')+'</div>'; },
   stepFinal
 ];
+
 // ── CONTEST STEPS ──
 var CON_STEPS = [
   stepPersonal,
@@ -478,13 +514,16 @@ var CON_STEPS = [
     '<div class="pgrid">'+pbox('front','Front')+pbox('side','Side')+pbox('back','Back')+'</div>'; },
   stepFinal
 ];
+
 var STEP_NAMES = {
   nutrition:['Personal Info','Body Stats','Nutrition Goals','Eating Habits','Food Prefs','Health & Life','Final Details'],
   training:['Personal Info','Body Stats','Training Goals','Background','Equipment','Health & Recovery','Final Details'],
   coaching:['Personal Info','Body Stats','Goals','Training','Nutrition','Health & Life','Coaching Prefs','Final Details'],
   contest:['Personal Info','Body Stats','Competition BG','Show Details','Conditioning','Training','Nutrition','Health','Stage Prep','Final Details']
 };
+
 var STEP_RENDERS = { nutrition:NUT_STEPS, training:TRN_STEPS, coaching:COA_STEPS, contest:CON_STEPS };
+
 // ── PROGRESS ──
 function renderProgress(){
   var names=STEP_NAMES[PKG_KEY]||[];
@@ -500,6 +539,7 @@ function renderProgress(){
     dots.appendChild(d);
   }
 }
+
 // ── RENDER STEP ──
 function renderStep(){
   renderProgress();
@@ -514,20 +554,25 @@ function renderStep(){
   bindEvents();
   try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){}
 }
+
 // ── BIND EVENTS ──
 function bindEvents(){
+  // text/select/textarea inputs
   g('card').querySelectorAll('.inp,.sel,.ta').forEach(function(el){
     el.addEventListener('input',function(){ D[el.id]=el.value; clearErr(el.id); });
   });
+  // range sliders
   g('card').querySelectorAll('input[type=range]').forEach(function(el){
     el.addEventListener('input',function(){
       var key=el.dataset.key; D[key]=parseInt(el.value);
       var sv=g('sv-'+key); if(sv) sv.textContent=el.value+'/10';
     });
   });
+  // toggle checkboxes
   g('card').querySelectorAll('.sw input').forEach(function(el){
     el.addEventListener('change',function(){ D[el.dataset.key]=el.checked; });
   });
+  // photo uploads
   g('card').querySelectorAll('.pbox input[type=file]').forEach(function(el){
     el.addEventListener('change',function(e){
       var side=el.dataset.side;
@@ -541,10 +586,13 @@ function bindEvents(){
       reader.readAsDataURL(file);
     });
   });
+  // signature
   var cv=g('sigCanvas'); if(cv) initSig(cv);
 }
-// ── CHIPS ──
+
+// ── CHIPS (delegated at document level) ──
 document.addEventListener('click',function(e){
+  // chips
   var chip=e.target.closest('.chip');
   if(chip){
     var key=chip.dataset.key, val=chip.dataset.val, multi=chip.dataset.multi==='1';
@@ -561,6 +609,7 @@ document.addEventListener('click',function(e){
     clearErr(key);
     return;
   }
+  // data-action buttons
   var btn=e.target.closest('[data-action]');
   if(!btn) return;
   var action=btn.dataset.action;
@@ -572,6 +621,7 @@ document.addEventListener('click',function(e){
   else if(action==='clearsig'){ clearSig(); }
   else if(action==='changepkg'){ step=0; initData(); renderPackageSelect(); }
 });
+
 // ── SIGNATURE ──
 function initSig(cv){
   var ctx=cv.getContext('2d');
@@ -609,6 +659,7 @@ function toggleAgree(){
   D.termsAgreed=!D.termsAgreed;
   var row=g('agreeRow'); if(row) row.classList.toggle('on',D.termsAgreed);
 }
+
 // ── VALIDATE ──
 var REQUIRED = {
   nutrition: {0:['firstName','lastName','email','phone','dob','gender'],1:['currentWeight'],2:['primaryGoal','activityLevel'],6:['emergencyName','emergencyRelation','emergencyPhone']},
@@ -631,14 +682,17 @@ function validate(){
   }
   return ok;
 }
+
 // ── NAV ──
 function goNext(){ if(!validate()) return; step++; renderStep(); }
 function goBack(){ step--; renderStep(); }
+
 // ── SUBMIT ──
 function submitForm(){
   if(!validate()) return;
   var btn=g('btnNext');
   btn.disabled=true; btn.textContent='Submitting...';
+
   var payload={
     organization_id:'5c47d613-4b4c-458f-94af-6c3f5860619c',
     package_type:PKG_KEY,
@@ -685,53 +739,57 @@ function submitForm(){
     signature_data:D.signatureData, terms_agreed:D.termsAgreed,
     status:'onboarding', source:'stripe_checkout'
   };
-  fetch('https://mwztnobeybuuslbfitnp.supabase.co/rest/v1/client_onboarding', {
+
+  // Netlify accepts the intake before we show a confirmation.
+  var controller=new AbortController();
+  var timer=setTimeout(function(){controller.abort();},20000);
+  var oldError=g('intake-error');if(oldError)oldError.remove();
+  fetch('/intake-form.html', {
     method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13enRub2JleWJ1dXNsYmZpdG5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDI3NzAsImV4cCI6MjA4OTQxODc3MH0.xqyuF7jV2hZRJcIhMV4yekApp1r9oIFd168JSINy6pr8I',
-      'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13enRub2JleWJ1dXNsYmZpdG5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDI3NzAsImV4cCI6MjA4OTQxODc3MH0.xqyuF7jV2hZRJcIhMV4yekApp1r9oIFd168JSINy6pr8I',
-      'Prefer':'return=minimal'
-    },
-    body:JSON.stringify(payload)
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:new URLSearchParams({
+      'form-name':'paid-client-intake',
+      'full_name':D.firstName+' '+D.lastName,
+      'email':D.email,
+      'package':PKG_KEY,
+      'intake_json':JSON.stringify(payload),
+      'subject':'New Coach Murray client intake',
+      'bot-field':''
+    }).toString(),
+    signal:controller.signal
   }).then(function(r){
-    if(r.ok) showSuccess();
-    else {
-      return fetch('https://mwztnobeybuuslbfitnp.supabase.co/rest/v1/leads',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13enRub2JleWJ1dXNsYmZpdG5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDI3NzAsImV4cCI6MjA4OTQxODc3MH0.xqyuF7jV2hZRJcIhMV4yekApp1r9oIFd168JSINy6pr8I',
-          'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13enRub2JleWJ1dXNsYmZpdG5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDI3NzAsImV4cCI6MjA4OTQxODc3MH0.xqyuF7jV2hZRJcIhMV4yekApp1r9oIFd168JSINy6pr8I',
-          'Prefer':'return=minimal'
-        },
-        body:JSON.stringify({organization_id:'5c47d613-4b4c-458f-94af-6c3f5860619c',first_name:D.firstName,last_name:D.lastName,email:D.email,phone:D.phone,status:'new_client',source:'stripe_onboarding',notes:JSON.stringify(payload)})
-      });
-    }
-  }).then(function(){ showSuccess(); })
-  .catch(function(){ showSuccess(); });
+    if(!r.ok)throw new Error('Intake not accepted');
+    showSuccess();
+  }).catch(function(){
+    btn.disabled=false;btn.textContent='Submit intake';
+    var error=document.createElement('p');error.id='intake-error';error.className='intake-error';error.setAttribute('role','alert');
+    error.textContent='Your intake could not be confirmed. Your answers are still here. Please retry or contact jonmurr.fit@gmail.com before closing this page.';
+    g('card').appendChild(error);
+  }).finally(function(){clearTimeout(timer);});
 }
+
 // ── SUCCESS ──
 function showSuccess(){
   g('progWrap').style.display='none';
   g('pkgBadge').style.display='none';
   var msgs={
-    nutrition:'Your personalized nutrition plan and macro targets are being generated.',
-    training:'Your monthly workout program is being built with progressive overload.',
-    coaching:'Your full training + nutrition plan and coaching strategy are being prepared.',
-    contest:'Your full prep timeline, phase plan, and peak week protocol are being built.'
+    nutrition:'Your nutrition intake has been received for review.',
+    training:'Your training intake has been received for review.',
+    coaching:'Your training and nutrition intake has been received for review.',
+    contest:'Your contest-prep intake has been received for review.'
   };
   g('card').innerHTML='<div class="success">'+
     '<div class="s-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3ECF8E" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>'+
-    '<h2>You\'re In. Let\'s Go. 💪</h2>'+
+    '<h2>Intake received.</h2>'+
     '<p>'+(msgs[PKG_KEY]||'Your personalized plan is being built.')+' Coach Murray will reach out within <strong style="color:var(--gold)">24–48 hours</strong>.</p>'+
     '<div class="s-steps">'+
     '<div class="s-step"><div class="s-num">1</div><div class="s-info"><strong>Intake Received</strong><span>Coach Murray has your full profile</span></div></div>'+
-    '<div class="s-step"><div class="s-num">2</div><div class="s-info"><strong>Plan Generated (automated)</strong><span>AI builds your personalized plan</span></div></div>'+
+    '<div class="s-step"><div class="s-num">2</div><div class="s-info"><strong>Coach review</strong><span>Jonathon reviews your goals and preferences</span></div></div>'+
     '<div class="s-step"><div class="s-num">3</div><div class="s-info"><strong>Kickoff Call (24–48 hrs)</strong><span>You\'ll get a calendar invite</span></div></div>'+
-    '<div class="s-step"><div class="s-num">4</div><div class="s-info"><strong>Week 1 Starts</strong><span>You execute. No looking back.</span></div></div>'+
+    '<div class="s-step"><div class="s-num">4</div><div class="s-info"><strong>Your first week</strong><span>Begin your plan and track your progress</span></div></div>'+
     '</div></div>';
 }
+
 // ── PACKAGE SELECT ──
 function renderPackageSelect(){
   g('progWrap').style.display='none';
@@ -750,6 +808,7 @@ function renderPackageSelect(){
   });
   g('card').innerHTML=html+'</div>';
 }
+
 function selectPkg(k){
   PKG_KEY=k; pkg=PACKAGES[k];
   g('pkgBadge').innerHTML='<div class="pkg-badge" style="color:'+pkg.color+';background:'+pkg.color+'22;border-color:'+pkg.color+'44">'+pkg.emoji+' '+pkg.label+' — '+pkg.price+'</div>';
@@ -757,6 +816,7 @@ function selectPkg(k){
   steps=STEP_RENDERS[k];
   step=0; initData(); renderStep();
 }
+
 // ── INIT ──
 if(!pkg){
   renderPackageSelect();
@@ -766,6 +826,7 @@ if(!pkg){
   steps=STEP_RENDERS[PKG_KEY];
   renderStep();
 }
+
 })();
 </script>
 </body>
