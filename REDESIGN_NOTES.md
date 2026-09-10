@@ -43,3 +43,7 @@ The original production deploy can be restored from Netlify deploy history. Sour
 The static build, JavaScript syntax, HTML asset paths, unique element IDs, and whitespace checks passed. All 1,600 valid quiz answer combinations return a valid package, with representative recommendation branches checked separately. Desktop and 390px mobile compositions were visually inspected. Navigation, FAQ disclosure, plan preselection, required inputs, and failed-submission recovery were exercised in a browser. Mobile inspection used a constrained iframe because the browser surface did not expose device emulation.
 
 No payment was made. Real-user Core Web Vitals and conversion improvements require traffic measurement after launch; no performance score or conversion uplift is asserted.
+
+## Launch verification
+
+Production deployment `6aa300a317db92589881b2ec` was published successfully to https://coach-murray.netlify.app/ on September 10, 2026. A synthetic application was submitted through the live browser, its fields were confirmed in the Netlify account, and the thank-you page appeared. That test record was then deleted. The live five-question quiz returned Nutrition for the tested nutrition-support scenario, and its application link correctly preselected Nutrition. Both form schemas were detected at deployment. The intake endpoint accepted a synthetic HTTP request; Netlify recorded a submission timestamp, but the test was not returned in the verified-submission list, so full paid onboarding capture remains unconfirmed. No real client intake or payment was used.
